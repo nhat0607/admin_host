@@ -1,0 +1,14 @@
+[
+  {
+    "hotelId": "h1001",
+    "policy": "Free cancellation up to 48 hours before check-in. After that, 50% will be charged."
+  },
+  {
+    "hotelId": "h1002",
+    "policy": "Free cancellation up to 72 hours before check-in. No refunds after that."
+  },
+  {
+    "hotelId": "h1003",
+    "policy": "Non-refundable for early bookings. 75% refund for standard bookings up to 7 days before check-in."
+  }
+]

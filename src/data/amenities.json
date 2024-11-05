@@ -1,0 +1,19 @@
+{
+  "amenities": [
+    { "id": 1, "name": "WiFi" },
+    { "id": 2, "name": "Air Conditioning" },
+    { "id": 3, "name": "Swimming Pool" },
+    { "id": 4, "name": "Free Parking" },
+    { "id": 5, "name": "Restaurant" },
+    { "id": 6, "name": "Gym" },
+    { "id": 7, "name": "Minibar" },
+    { "id": 8, "name": "Balcony" },
+    { "id": 9, "name": "Beach Access" },
+    { "id": 10, "name": "Spa" },
+    { "id": 11, "name": "Pet Friendly" },
+    { "id": 12, "name": "Room Service" },
+    { "id": 13, "name": "Business Center" },
+    { "id": 14, "name": "Laundry Service" },
+    { "id": 15, "name": "Bar" }
+  ]
+}

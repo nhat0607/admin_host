@@ -1,0 +1,57 @@
+[
+  {
+    "bookingId": "b001",
+    "userId": "u001",
+    "hotelId": "h1001",
+    "roomId": "r101",
+    "checkInDate": "2024-10-05",
+    "checkOutDate": "2024-10-08",
+    "totalPrice": 750,
+    "currency": "EUR",
+    "status": "confirmed"
+  },
+  {
+    "bookingId": "b002",
+    "userId": "u002",
+    "hotelId": "h1002",
+    "roomId": "r201",
+    "checkInDate": "2024-11-01",
+    "checkOutDate": "2024-11-05",
+    "totalPrice": 1600,
+    "currency": "USD",
+    "status": "pending"
+  },
+  {
+    "bookingId": "b003",
+    "userId": "u003",
+    "hotelId": "h1003",
+    "roomId": "r301",
+    "checkInDate": "2024-12-12",
+    "checkOutDate": "2024-12-15",
+    "totalPrice": 900,
+    "currency": "CHF",
+    "status": "confirmed"
+  },
+  {
+    "bookingId": "b004",
+    "userId": "u004",
+    "hotelId": "h1004",
+    "roomId": "r401",
+    "checkInDate": "2024-09-20",
+    "checkOutDate": "2024-09-22",
+    "totalPrice": 250,
+    "currency": "GBP",
+    "status": "cancelled"
+  },
+  {
+    "bookingId": "b005",
+    "userId": "u005",
+    "hotelId": "h1005",
+    "roomId": "r501",
+    "checkInDate": "2024-10-10",
+    "checkOutDate": "2024-10-12",
+    "totalPrice": 500,
+    "currency": "AUD",
+    "status": "confirmed"
+  }
+]

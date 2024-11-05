@@ -1,0 +1,16 @@
+[
+  {
+    "reviewId": "rev001",
+    "hotelId": "h1001",
+    "userId": "u001",
+    "rating": 5,
+    "comment": "Excellent stay at the Grand Palace!"
+  },
+  {
+    "reviewId": "rev002",
+    "hotelId": "h1002",
+    "userId": "u002",
+    "rating": 4,
+    "comment": "Great ocean view, but a bit pricey."
+  }
+]

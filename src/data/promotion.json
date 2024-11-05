@@ -1,0 +1,23 @@
+[
+  {
+    "promotionId": "p001",
+    "hotelId": "h1001",
+    "description": "20% off for stays longer than 3 nights",
+    "startDate": "2024-09-01",
+    "endDate": "2024-12-31"
+  },
+  {
+    "promotionId": "p002",
+    "hotelId": "h1002",
+    "description": "Free breakfast included for the first 2 nights",
+    "startDate": "2024-10-01",
+    "endDate": "2024-11-30"
+  },
+  {
+    "promotionId": "p003",
+    "hotelId": "h1003",
+    "description": "50% off for early bookings",
+    "startDate": "2024-11-01",
+    "endDate": "2024-12-31"
+  }
+]

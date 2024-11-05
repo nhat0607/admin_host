@@ -1,0 +1,10 @@
+{
+  "paymentMethods": [
+    "Credit Card",
+    "Debit Card",
+    "PayPal",
+    "Bank Transfer",
+    "Apple Pay",
+    "Google Pay"
+  ]
+}

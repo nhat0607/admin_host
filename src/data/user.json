@@ -1,0 +1,38 @@
+[
+  {
+    "userId": "u001",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "hashedpassword",
+    "bookings": [
+      {
+        "bookingId": "b001",
+        "hotelId": "h1001",
+        "roomId": "r101",
+        "checkInDate": "2024-10-05",
+        "checkOutDate": "2024-10-08",
+        "totalPrice": 750,
+        "currency": "EUR",
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
+    "userId": "u002",
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "password": "hashedpassword",
+    "bookings": [
+      {
+        "bookingId": "b002",
+        "hotelId": "h1002",
+        "roomId": "r201",
+        "checkInDate": "2024-11-01",
+        "checkOutDate": "2024-11-05",
+        "totalPrice": 1600,
+        "currency": "USD",
+        "status": "pending"
+      }
+    ]
+  }
+]

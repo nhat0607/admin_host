@@ -1,0 +1,141 @@
+/* General Container Styles */
+.table-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-container .ant-table-thead > tr > th,
+.table-container .ant-table-tbody > tr > td {
+    text-align: center; 
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.table-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.ant-table {
+    background-color: white;
+}
+
+.ant-table-thead > tr > th {
+    background-color: #f0f2f5;
+    font-weight: 600;
+    color: #595959;
+    text-transform: uppercase;
+}
+
+.ant-table-tbody > tr > td {
+    font-size: 14px;
+    color: #595959;
+}
+
+.ant-table-tbody > tr:hover {
+    background-color: #fafafa;
+}
+
+.ant-btn-primary {
+    background-color: #52c41a;
+    border-color: #52c41a;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+    background-color: #389e0d;
+    border-color: #389e0d;
+}
+
+.ant-input-search {
+    border-radius: 4px;
+}
+
+.ant-input-search-button {
+    border-radius: 4px;
+    background-color: #1890ff;
+}
+
+.ant-input-search-button:hover,
+.ant-input-search-button:focus {
+    background-color: #40a9ff;
+}
+
+.ant-modal {
+    border-radius: 8px;
+}
+
+.ant-modal-header {
+    border-radius: 8px 8px 0 0;
+    background-color: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-modal-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.ant-modal-footer {
+    border-top: none;
+}
+
+.ant-form-item {
+    margin-bottom: 16px;
+}
+
+.ant-form-item-label > label {
+    font-weight: 500;
+    color: #595959;
+}
+
+.ant-form-item .ant-input,
+.ant-form-item .ant-select-selector {
+    border-radius: 4px;
+}
+
+.ant-popover-message-title {
+    font-weight: bold;
+}
+
+
+.ant-popover {
+    text-align: left; 
+}
+
+.ant-popover .ant-popover-inner {
+    border-radius: 4px; 
+}
+
+.ant-popover .ant-popover-title {
+    background-color: #f0f2f5; 
+    font-weight: bold;
+}
+
+/* Custom Popover Item Styles */
+.ant-popover .ant-popover-item {
+    padding: 10px;
+    cursor: pointer; 
+}
+
+.ant-popover .ant-popover-item:hover {
+    background-color: #e6f7ff; 
+}
+
+.ant-picker {
+    width: 100%; 
+    border-radius: 4px; 
+  }
+
+.ant-picker-suffix {
+    color: rgba(0, 0, 0, 0.45); 
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "hotelId": "h1001",
+    "roomId": "r101",
+    "availability": [
+      {
+        "startDate": "2024-10-01",
+        "endDate": "2024-10-10",
+        "roomsAvailable": 5
+      },
+      {
+        "startDate": "2024-10-11",
+        "endDate": "2024-10-20",
+        "roomsAvailable": 2
+      }
+    ]
+  },
+  {
+    "hotelId": "h1002",
+    "roomId": "r201",
+    "availability": [
+      {
+        "startDate": "2024-11-01",
+        "endDate": "2024-11-05",
+        "roomsAvailable": 3
+      },
+      {
+        "startDate": "2024-11-06",
+        "endDate": "2024-11-15",
+        "roomsAvailable": 1
+      }
+    ]
+  }
+
+]

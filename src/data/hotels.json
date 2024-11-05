@@ -1,0 +1,194 @@
+[
+  {
+    "hotelId": "h1001",
+    "name": "Grand Palace Hotel",
+    "location": {
+      "country": "France",
+      "city": "Paris",
+      "address": "123 Champs-Élysées",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "facilities": ["Restaurant", "Gym", "Swimming Pool", "Free Parking"],
+    "images": [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/24/35/00/fd/le-sands-oceanfront-danang.jpg?w=1200&h=-1&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/e8/3d/2b/sala-danang-beach-hotel.jpg?w=700&h=-1&s=1"
+    ]
+  },
+  {
+    "hotelId": "h1002",
+    "name": "Ocean View Resort",
+    "location": {
+      "country": "USA",
+      "city": "Miami",
+      "address": "456 Ocean Drive",
+      "latitude": 25.7617,
+      "longitude": -80.1918
+    },
+    "facilities": ["Beach Access", "Swimming Pool", "Spa", "Free WiFi"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1003",
+    "name": "Mountain Escape Lodge",
+    "location": {
+      "country": "Switzerland",
+      "city": "Zermatt",
+      "address": "789 Alpine Way",
+      "latitude": 46.0207,
+      "longitude": 7.7491
+    },
+    "facilities": ["Skiing", "Spa", "Restaurant", "Free Breakfast"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1004",
+    "name": "City Center Inn",
+    "location": {
+      "country": "UK",
+      "city": "London",
+      "address": "101 Oxford Street",
+      "latitude": 51.5074,
+      "longitude": -0.1278
+    },
+    "facilities": ["Free WiFi", "Parking", "Gym"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1005",
+    "name": "Beachside Bungalow",
+    "location": {
+      "country": "Australia",
+      "city": "Sydney",
+      "address": "987 Bondi Beach",
+      "latitude": -33.8915,
+      "longitude": 151.2767
+    },
+    "facilities": ["Beach Access", "Swimming Pool", "Bar"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1006",
+    "name": "Grand Palace Hotel",
+    "location": {
+      "country": "France",
+      "city": "Paris",
+      "address": "123 Champs-Élysées",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "facilities": ["Restaurant", "Gym", "Swimming Pool", "Free Parking"],
+    "images": [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/24/35/00/fd/le-sands-oceanfront-danang.jpg?w=1200&h=-1&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/e8/3d/2b/sala-danang-beach-hotel.jpg?w=700&h=-1&s=1"
+    ]
+  },
+  {
+    "hotelId": "h1007",
+    "name": "Ocean View Resort",
+    "location": {
+      "country": "USA",
+      "city": "Miami",
+      "address": "456 Ocean Drive",
+      "latitude": 25.7617,
+      "longitude": -80.1918
+    },
+    "facilities": ["Beach Access", "Swimming Pool", "Spa", "Free WiFi"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1011",
+    "name": "Grand Palace Hotel",
+    "location": {
+      "country": "France",
+      "city": "Paris",
+      "address": "123 Champs-Élysées",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    "facilities": ["Restaurant", "Gym", "Swimming Pool", "Free Parking"],
+    "images": [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/24/35/00/fd/le-sands-oceanfront-danang.jpg?w=1200&h=-1&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/e8/3d/2b/sala-danang-beach-hotel.jpg?w=700&h=-1&s=1"
+    ]
+  },
+  {
+    "hotelId": "h1012",
+    "name": "Ocean View Resort",
+    "location": {
+      "country": "USA",
+      "city": "Miami",
+      "address": "456 Ocean Drive",
+      "latitude": 25.7617,
+      "longitude": -80.1918
+    },
+    "facilities": ["Beach Access", "Swimming Pool", "Spa", "Free WiFi"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1013",
+    "name": "Mountain Escape Lodge",
+    "location": {
+      "country": "Switzerland",
+      "city": "Zermatt",
+      "address": "789 Alpine Way",
+      "latitude": 46.0207,
+      "longitude": 7.7491
+    },
+    "facilities": ["Skiing", "Spa", "Restaurant", "Free Breakfast"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1009",
+    "name": "City Center Inn",
+    "location": {
+      "country": "UK",
+      "city": "London",
+      "address": "101 Oxford Street",
+      "latitude": 51.5074,
+      "longitude": -0.1278
+    },
+    "facilities": ["Free WiFi", "Parking", "Gym"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  },
+  {
+    "hotelId": "h1010",
+    "name": "Beachside Bungalow",
+    "location": {
+      "country": "Australia",
+      "city": "Sydney",
+      "address": "987 Bondi Beach",
+      "latitude": -33.8915,
+      "longitude": 151.2767
+    },
+    "facilities": ["Beach Access", "Swimming Pool", "Bar"],
+    "images": [
+      "https://grandoceanhotel.com.vn/wp-content/uploads/2019/01/Hoboi-4.jpg",
+      "https://images.trvl-media.com/lodging/56000000/55320000/55315600/55315599/62bec2b8.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"
+    ]
+  }
+]

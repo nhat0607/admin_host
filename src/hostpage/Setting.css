@@ -1,0 +1,72 @@
+.Setting-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    background-color: #f5f5f5; 
+    padding: 20px; 
+  }
+  
+  .Setting-container {
+    display: flex;
+    width: 90%; 
+    max-width: 1200px; 
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .Setting-page .sidebar {
+    width: 25%;
+    background-color: #fafafa; 
+    padding: 20px;
+    border-right: 1px solid #e0e0e0; 
+    overflow-y: auto; 
+  }
+  
+  .Setting-page .content {
+    flex: 1;
+    padding: 30px;
+    background-color: #fff;
+    overflow-y: auto; 
+    max-height: 80vh; 
+  }
+  
+  .Setting-page .sidebar h2,
+  .Setting-page .content h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .Setting-page .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .Setting-page .sidebar ul li {
+    padding: 10px 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #555;
+  }
+  
+  .Setting-page .sidebar ul li.active {
+    background-color: #4f6f52 !important;
+    color: #fff !important;
+    border-radius: 5px;
+  }
+  
+  .Setting-page .sidebar ul li:hover {
+    background-color: #e0e0e0; 
+    color: #333;
+    border-radius: 5px; 
+  }
+
+  .Setting-page .sidebar ul li.active:hover {
+    background-color: #4f6f52 !important;
+    color: #fff !important;
+  }
+
+  
