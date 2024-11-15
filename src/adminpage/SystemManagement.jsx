@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, message } from 'antd';
-import { getMaintenanceMode, updateMaintenanceMode } from '../api/api'; // Adjust the import based on your file structure
+import { getMaintenanceMode, updateMaintenanceMode } from '../api/api'; 
 
 const SystemManagement = ({ setMaintenanceMode }) => {
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);

@@ -101,8 +101,8 @@ export const addCustomer = async (adminUser: User | null, customer: Omit<User, '
                     latitude: "",
                     longitude: ""
                 },
-                facilities: [],
-                images: []
+                facilities: [] as string[],
+                images: [] as string[]
             };
 
 
@@ -200,7 +200,7 @@ export const getBookingsByHotelId = async (user: User | null): Promise<Booking[]
         const response = await axios.get<Booking[]>(`${API_BASE_URL}/booking`, {
             params: { hotelId: user.hotelId },
         });
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error('Failed to fetch bookings:', error);
@@ -231,18 +231,28 @@ export const addBooking = async (user: User | null, booking: Omit<Booking, 'book
 
         const updatedRoomResponse = await updateRoom(user, roomToUpdate.id, { available: newAvailable });
 
-        console.log(`Room ID: ${roomToUpdate.id}, New Available Count: ${newAvailable}`);
+        // console.log(`Room ID: ${roomToUpdate.id}, New Available Count: ${newAvailable}`);
         
         if (newAvailable === 0) {
             await updateRoom(user, roomToUpdate.id, { status: 'ROO' });
-            console.log(`Room ID: ${roomToUpdate.id} status updated to 'ROO'`);
+            // console.log(`Room ID: ${roomToUpdate.id} status updated to 'ROO'`);
         }
 
         const bookingWithHotelId = { ...booking, hotelId: user.hotelId };
 
         const response = await axios.post<Booking>(`${API_BASE_URL}/booking`, bookingWithHotelId);
-        console.log('Booking added successfully:', response.data);
-        
+        const newBooking = response.data;
+        const userResponse = await axios.get<User>(`${API_BASE_URL}/users/${booking.userId}`);
+        const updatedUser = {
+            ...userResponse.data,
+            bookingIds: [...userResponse.data.bookingIds, newBooking.id],
+        };
+
+        // Update the user data with the new booking ID in bookingIds
+        await axios.put(`${API_BASE_URL}/users/${booking.userId}`, updatedUser);
+
+        // console.log('Booking added successfully:', newBooking);
+        return newBooking;
         return response.data;
     } catch (error) {
         console.error('Failed to add booking:', error);
@@ -388,7 +398,11 @@ export const updateRoom = async (user: User | null, roomId: string, room: Partia
         const response = await axios.patch<Room>(`${API_BASE_URL}/rooms/${roomId}`, updatedRoom);
         return response.data;
     } catch (error) {
-        console.error('Failed to update room:', error.message);
+        if (error instanceof Error) {
+            console.error('Failed to update room:', error.message);
+        } else {
+            console.error('Failed to update room:', error);
+        }
         throw error;
     }
 };
@@ -544,16 +558,75 @@ export const deletePromotion = async (user: User | null, promotionId: string): P
     }
 };
 
-
-export const updateMaintenanceMode = async (isMaintenance) => {
-    try {
-      const response = await axios.patch(`${API_BASE_URL}/settings/1`, { maintenanceMode: isMaintenance });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to update maintenance mode:", error);
-      throw error;
+export const getRatingByHotelId = async (user: User | null): Promise<any[]> => {
+    if (!user || !user.hotelId) {
+        throw new Error('Access denied: User does not have an associated hotel ID.');
     }
-  };
+
+    try {
+        const response = await axios.get(`${API_BASE_URL}/review`, {
+            params: { hotelId: user.hotelId },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch promotions:', error);
+        throw error;
+    }
+};
+
+export const addReview = async (user: User | null, review: Omit<any, 'id'>): Promise<any> => {
+    if (!user || !user.hotelId) {
+        throw new Error('Access denied: User does not have an associated hotel ID.');
+    }
+
+    try {
+        const promotionWithHotelId = { ...review, hotelId: user.hotelId };
+        const response = await axios.post(`${API_BASE_URL}/review`, promotionWithHotelId);
+        return response.data; 
+    } catch (error) {
+        console.error('Failed to add promotion:', error);
+        throw error;
+    }
+};
+
+export const updateReview = async (user: User | null, reviewId: string, review: Partial<any>): Promise<any> => {
+    if (!user || !user.hotelId) {
+        throw new Error('Access denied: User does not have an associated hotel ID.');
+    }
+
+    try {
+        const response = await axios.patch(`${API_BASE_URL}/review/${reviewId}`, review);
+        return response.data; 
+    } catch (error) {
+        console.error('Failed to update promotion:', error);
+        throw error;
+    }
+};
+
+export const deleteReview = async (user: User | null, reviewId: string): Promise<void> => {
+    if (!user || !user.hotelId) {
+        throw new Error('Access denied: User does not have an associated hotel ID.');
+    }
+
+    try {
+        await axios.delete(`${API_BASE_URL}/review/${reviewId}`);
+    } catch (error) {
+        console.error('Failed to delete promotion:', error);
+        throw error;
+    }
+};
+
+
+export const updateMaintenanceMode = async (isMaintenance: boolean) => {
+    try {
+        const response = await axios.patch(`${API_BASE_URL}/settings/1`, { maintenanceMode: isMaintenance });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to update maintenance mode:", error);
+        throw error;
+    }
+};
+
   
   export const getMaintenanceMode = async () => {
     try {
@@ -563,4 +636,6 @@ export const updateMaintenanceMode = async (isMaintenance) => {
       console.error("Failed to fetch maintenance mode:", error);
       throw error; 
     }
-  };
+};
+
+

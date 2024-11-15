@@ -39,6 +39,7 @@ export type Hotel = {
     email: string;
     password: string;
     role: Role;
+    status: "Active" | "Ban";
     bookingIds?: string[];
     hotelId?: string;
   };
@@ -78,7 +79,7 @@ export type Hotel = {
     checkOutDate: string;
     totalPrice: number | string; 
     currency: string;
-    status: "confirmed" | "pending" | "cancelled";
+    status: "confirmed" | "pending" | "cancelled" | "completed";
   };
   
   export type PaymentMethod = {
@@ -93,6 +94,10 @@ export type Hotel = {
     description: string;
     startDate: string;
     endDate: string;
+    minCapacity?: number | null;
+    minTotalDays?: number | null; 
+    minTotalPrice?: number | null; 
+    discountPercentage: number; 
   };
   
   export type Policy = {

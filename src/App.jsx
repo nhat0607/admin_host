@@ -7,6 +7,9 @@ import UserPage from './userpage/Userpage';
 import MaintenancePage from './components/MaintenancePage';
 import { getMaintenanceMode } from './api/api';
 import ProtectedRoute from './components/ProtectedRoute'; 
+import BannedPage from './components/BannedPage';
+import UserDetail from './adminpage/UserDetail';
+
 const App = () => {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [user, setUser] = useState(null); 
@@ -29,11 +32,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login setUser={setUser} />} />
 
-        <Route path="/admin-dashboard" element={
-          <ProtectedRoute user={user}>
-            <AdminSidebar user={user} maintenanceMode={maintenanceMode} setMaintenanceMode={setMaintenanceMode} />
-          </ProtectedRoute>
-        } />
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={<AdminSidebar user={user} maintenanceMode={maintenanceMode} setMaintenanceMode={setMaintenanceMode} />} />
+        {/* <Route path="/admin/customer-manager/:userid" element={<UserDetail />} /> */}
+
         
         <Route path="/host-dashboard" element={
           <ProtectedRoute user={user}>
@@ -48,6 +50,9 @@ const App = () => {
         } />
         
         <Route path="/maintenance" element={<MaintenancePage />} />
+
+        <Route path="/banned" element={<BannedPage />} />
+        
       </Routes>
     </Router>
   );

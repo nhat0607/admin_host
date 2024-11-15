@@ -10,11 +10,12 @@ const Login = ({ setUser }) => {
   const handleLogin = async (values) => {
     const { email, password } = values;
 
+    // Use the login function from the API
     const user = await login(email, password);
     if (user) {
-      setUser(user);
+      setUser(user); // Now we expect user to contain role, email, etc.
       if (user.role === 'admin') {
-        navigate('/admin-dashboard');
+        navigate('/admin/dashboard');
       } else if (user.role === 'host') {
         navigate('/host-dashboard');
       } else {

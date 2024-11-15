@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm, Popover, Select } from 'antd';
-import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { getBookingsByHotelId, addBooking, updateBooking, deleteBooking, getUserById, getRoomsByHotelId } from '../api/api';
+import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm, Popover, Select, Slider, Menu, DatePicker, Dropdown } from 'antd';
+import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined, FilterOutlined } from '@ant-design/icons';
+import { getBookingsByHotelId, addBooking, updateBooking, deleteBooking, getUserById, getRoomsByHotelId, updateRoom } from '../api/api';
+import DateSelection from "../components/DateSection"; 
 import './Components.css';
 import moment from 'moment';
 
@@ -10,6 +11,7 @@ const { Option } = Select;
 const Booking = ({ user }) => {
   const [dataSource, setDataSource] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [allRooms, setAllRooms] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -17,6 +19,25 @@ const Booking = ({ user }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [isUserModalVisible, setUserModalVisible] = useState(false);
   const [calculatedTotalPrice, setCalculatedTotalPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(500);  
+  const [checkInDate, setCheckInDate] = useState(null);
+  const [checkOutDate, setCheckOutDate] = useState(null);
+  const [currentTime, setCurrentTime] = useState(moment('2024-11-28')); 
+
+
+  const [filters, setFilters] = useState({
+    totalPrice: [0, 500],
+    checkInDate: null,
+    checkOutDate: null,
+    status: null,
+  });
+  const [tempFilters, setTempFilters] = useState({
+    totalPrice: [0, 500],
+    checkInDate: null,
+    checkOutDate: null,
+    status: null,
+  });
+  const [filterVisible, setFilterVisible] = useState(false);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -39,12 +60,82 @@ const Booking = ({ user }) => {
         );
 
         setDataSource(bookingsWithDetails);
-        setRooms(availableRooms); 
+        setRooms(availableRooms);
+        setAllRooms(rooms);
+        const maxPriceInData = bookingsWithDetails.reduce((max, booking) => Math.max(max, booking.totalPrice), 0);
+        setMaxPrice(maxPriceInData);
+                
+        setFilters((prevFilters) => ({ ...prevFilters, totalPrice: [0, maxPriceInData] }));
+        setTempFilters((prevTempFilters) => ({ ...prevTempFilters, totalPrice: [0, maxPriceInData] })); 
       }
     };
 
     fetchBookings();
   }, [user]);
+  
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setCurrentTime(moment()); 
+  //   }, 86400000); 
+  //   return () => clearInterval(intervalId); 
+  // }, []);
+
+  
+
+  // const updateRoomAvailability = async (roomId, num) => {
+  //   const updatedRooms = [...rooms]; 
+  //   const roomIndex = updatedRooms.findIndex(room => room.id === roomId);
+    
+  //   if (roomIndex !== -1) {
+  //     const room = updatedRooms[roomIndex];
+  //     room.available += num; 
+  //     console.log("Updated room availability:", room.available);
+  
+  //     setRooms(updatedRooms);
+  
+  //     await updateRoom(user, roomId, { available: room.available });
+  //   }
+  // };
+  
+  // useEffect(() => {
+  //   const checkAndUpdateBookingStatus = async () => {
+  //     const updatedData = await Promise.all(
+  //       dataSource.map(async (booking) => {
+  //         const checkIn = moment(booking.checkInDate);
+  //         const checkOut = moment(booking.checkOutDate);
+  
+  //         let statusChanged = false;
+  
+  //         if (currentTime.isSameOrAfter(checkIn) && currentTime.isBefore(checkOut)) {
+  //           if (booking.status !== 'confirmed') {
+  //             booking.status = 'confirmed';
+  //             statusChanged = true;
+  //           }
+  //         } else if (currentTime.isAfter(checkOut) && booking.status === 'confirmed') {
+  //           const room = rooms.find(room => room.id === booking.roomId);
+  //           if (room) {
+  //             await updateRoomAvailability(booking.roomId, 1); 
+  //           }
+  //           booking.status = 'completed';
+  //           statusChanged = true;
+  //         }
+  
+  //         if (statusChanged) {
+  //           await updateBooking(user, booking.id, { ...booking, status: booking.status });
+  //         }
+  
+  //         return booking;
+  //       })
+  //     );
+  
+  //     if (updatedData.some((booking, index) => booking.status !== dataSource[index]?.status)) {
+  //       setDataSource(updatedData);
+  //     }
+  //   };
+  
+  //   checkAndUpdateBookingStatus();
+  // }, [currentTime, rooms, user]);
+  
 
   const calculateTotalPrice = (roomId, checkInDate, checkOutDate) => {
     if (!roomId || !checkInDate || !checkOutDate) return 0;
@@ -66,6 +157,8 @@ const Booking = ({ user }) => {
     setModalVisible(true);
     form.resetFields();
     setCalculatedTotalPrice(0);
+    setCheckInDate(null);
+    setCheckOutDate(null);
   };
 
   const handleEditBooking = (record) => {
@@ -76,6 +169,8 @@ const Booking = ({ user }) => {
 
     const initialTotalPrice = calculateTotalPrice(record.roomId, record.checkInDate, record.checkOutDate);
     setCalculatedTotalPrice(initialTotalPrice);
+    setCheckInDate(record.checkInDate ? moment(record.checkInDate).toDate() : null);
+    setCheckOutDate(record.checkOutDate ? moment(record.checkOutDate).toDate() : null);
   };
 
   const handleDeleteBooking = async (key) => {
@@ -91,7 +186,15 @@ const Booking = ({ user }) => {
   };
 
   const handleFormSubmit = async (values) => {
+    if (!selectedBooking) { 
+      const roomToUpdate = rooms.find((room) => room.id === values.roomId);
+      if (roomToUpdate && roomToUpdate.available > 0) {
+        updateRoomAvailability(values.roomId, -1); 
+      }
+    }
+
     values.totalPrice = calculatedTotalPrice;
+    values.status = selectedBooking ? values.status : 'pending';
 
     if (selectedBooking) {
       await updateBooking(user, selectedBooking.id, values);
@@ -101,7 +204,7 @@ const Booking = ({ user }) => {
       setDataSource(updatedData);
     } else {
       const newBooking = await addBooking(user, values);
-      setDataSource([...dataSource, newBooking]);
+      setDataSource([newBooking, ...dataSource]); 
     }
     handleModalCancel();
   };
@@ -139,6 +242,128 @@ const Booking = ({ user }) => {
         </Button>
       </Popconfirm>
     </div>
+  );
+
+
+  const handleResetFilter = () => {
+    setTempFilters({
+      totalPrice: [0, maxPrice],
+      checkInDate: null,
+      checkOutDate: null,
+      status: null,
+    });
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    setFilterVisible(false);
+  };
+
+  const filteredBookingData = dataSource.filter((booking) => {
+    const { totalPrice, checkInDate, checkOutDate, status, roomType } = filters;
+ 
+    return (
+       (totalPrice ? booking.totalPrice >= totalPrice[0] && booking.totalPrice <= totalPrice[1] : true) &&
+       (checkInDate ? moment(booking.checkInDate).isSameOrAfter(moment(checkInDate)) : true) &&
+       (checkOutDate ? moment(booking.checkOutDate).isSameOrBefore(moment(checkOutDate)) : true) &&
+       (status ? booking.status === status : true) &&
+       (roomType ? booking.roomType === roomType : true)
+    );
+  });
+ 
+
+  const filterMenu = (
+    <Menu>
+      <div className="filter-title">Filter Bookings</div>
+  
+      <Menu.Item key="roomType">
+        <div className="filter-section">
+          <div className="filter-label">Room Type</div>
+          <Select
+            value={tempFilters.roomType}
+            onChange={(value) => setTempFilters({ ...tempFilters, roomType: value })}
+            placeholder="Select Room Type"
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {allRooms.map((room) => (
+              <Option key={room.id} value={room.type}>
+                {room.type}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="totalPrice">
+        <div className="filter-section">
+          <div className="filter-label">Total Price Range</div>
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <div>{tempFilters.totalPrice[0]}</div>
+            <Slider
+              range
+              value={tempFilters.totalPrice}
+              onChange={(value) => setTempFilters({ ...tempFilters, totalPrice: value })}
+              min={0}
+              max={maxPrice}
+              style={{ flex: 1, margin: '0 10px' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div>{tempFilters.totalPrice[1]}</div>
+          </div>
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="checkInDate">
+        <div className="filter-section">
+          <div className="filter-label">Check-In Date</div>
+          <AntInput
+            type="date"
+            value={tempFilters.checkInDate ? tempFilters.checkInDate.toISOString().split('T')[0] : ''}
+            onChange={(e) => setTempFilters({ ...tempFilters, checkInDate: e.target.value ? new Date(e.target.value) : null })}
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="checkOutDate">
+        <div className="filter-section">
+          <div className="filter-label">Check-Out Date</div>
+          <AntInput
+            type="date"
+            value={tempFilters.checkOutDate ? tempFilters.checkOutDate.toISOString().split('T')[0] : ''}
+            onChange={(e) => setTempFilters({ ...tempFilters, checkOutDate: e.target.value ? new Date(e.target.value) : null })}
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      </Menu.Item>
+
+      <Menu.Item key="status">
+        <div className="filter-section">
+          <div className="filter-label">Status</div>
+          <Select
+            value={tempFilters.status}
+            onChange={(value) => setTempFilters({ ...tempFilters, status: value })}
+            placeholder="Select Status"
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Option value="confirmed">Confirmed</Option>
+            <Option value="pending">Pending</Option>
+            <Option value="canceled">Canceled</Option>
+          </Select>
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="filter-buttons">
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Button onClick={handleResetFilter}>Reset</Button>
+          <Button type="primary" onClick={applyFilters}>Apply Filter</Button>
+        </div>
+      </Menu.Item>
+    </Menu>
   );
 
   const columns = [
@@ -186,13 +411,27 @@ const Booking = ({ user }) => {
         <h3>Booking List</h3>
         <Space>
           <Input.Search placeholder="Search bookings..." style={{ width: 200 }} />
+          <Dropdown   
+            overlay={filterMenu}
+            visible={filterVisible}
+            onVisibleChange={(visible) => setFilterVisible(visible)}
+            trigger={['click']}
+            overlayStyle={{ zIndex: 1050 }}
+            dropdownRender={(menu) => (
+              <div onMouseDown={(e) => e.stopPropagation()}>{menu}</div>
+            )}
+          >
+            <Button type="primary" icon={<FilterOutlined />}>
+              Filter
+            </Button>
+          </Dropdown>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAddBooking}>
             Add Booking
           </Button>
         </Space>
       </div>
       <Table 
-        dataSource={dataSource} 
+        dataSource={filteredBookingData}  
         columns={columns} 
         pagination={{ pageSize: 10 }} 
       />
@@ -211,16 +450,27 @@ const Booking = ({ user }) => {
             <Select placeholder="Select a room">
               {rooms.map((room) => (
                 <Option key={room.id} value={room.id}>
-                  {room.type} (Room ID: {room.id})
+                  {room.type}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="Check-in Date" name="checkInDate" rules={[{ required: true, message: 'Please select check-in date' }]}>
-            <AntInput type="date" />
+          <Form.Item label="Check-In Date" name="checkInDate" rules={[{ required: true, message: 'Please select a check-in date' }]}>
+            <AntInput
+              type="date"
+              value={checkInDate ? moment(checkInDate).format('YYYY-MM-DD') : ''}
+              onChange={(e) => setCheckInDate(e.target.value ? moment(e.target.value) : null)}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
-          <Form.Item label="Check-out Date" name="checkOutDate" rules={[{ required: true, message: 'Please select check-out date' }]}>
-            <AntInput type="date" />
+
+          <Form.Item label="Check-Out Date" name="checkOutDate" rules={[{ required: true, message: 'Please select a check-out date' }]}>
+            <AntInput
+              type="date"
+              value={checkOutDate ? moment(checkOutDate).format('YYYY-MM-DD') : ''}
+              onChange={(e) => setCheckOutDate(e.target.value ? moment(e.target.value) : null)}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
           <Form.Item label="Total Price" name="totalPrice">
             <AntInput value={calculatedTotalPrice} disabled />

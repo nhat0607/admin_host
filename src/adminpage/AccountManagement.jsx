@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm, Popover, Select } from 'antd';
-import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { getCustomers, addCustomer, updateCustomer, deleteCustomer } from '../api/api'; 
+import { useNavigate } from 'react-router-dom';
+import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm, Popover, Select, Menu, Dropdown } from 'antd';
+import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined, FilterOutlined } from '@ant-design/icons';
+import { getCustomers, addCustomer, updateCustomer } from '../api/api'; 
 import '../hostpage/Components.css';
 
 const { Option } = Select;
@@ -12,6 +13,17 @@ const Customers = ({ user }) => {
   const [form] = Form.useForm();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState({});
+  const navigate = useNavigate();
+  const [filters, setFilters] = useState({
+    role: null,
+    status: null,
+  });
+  
+  const [tempFilters, setTempFilters] = useState({
+    role: null,
+    status: null,
+  });
+  const [filterVisible, setFilterVisible] = useState(false);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -42,14 +54,18 @@ const Customers = ({ user }) => {
     }
   };
 
-  const handleDeleteCustomer = async (id) => {
+  const handleToggleStatus = async (record) => {
     if (user.role === 'admin') {
-      await deleteCustomer(user, id); 
-      const updatedData = dataSource.filter((item) => item.id !== id);
+      const updatedStatus = record.status === 'Active' ? 'Ban' : 'Active';
+      console.log(record.id);
+      const updatedCustomer = await updateCustomer(user, record.id, { ...record, status: updatedStatus });
+      const updatedData = dataSource.map((item) =>
+        item.id === updatedCustomer.id ? updatedCustomer : item
+      );
       setDataSource(updatedData);
-      setPopoverVisible((prev) => ({ ...prev, [id]: false })); 
+      setPopoverVisible((prev) => ({ ...prev, [record.id]: false })); 
     } else {
-      alert("You do not have permission to delete customers.");
+      alert("You do not have permission to change customer status.");
     }
   };
 
@@ -59,25 +75,47 @@ const Customers = ({ user }) => {
   };
 
   const handleFormSubmit = async (values) => {
-    const role = values.role === "customer" ? "user" : values.role; 
-  
+    const role = values.role === "customer" ? "user" : values.role;
+    const status = values.status || 'Active';
+
     const customerData = {
       ...values,
-      role: role, 
+      role: role,
+      status: status,
     };
-  
+
     if (selectedCustomer) {
-      const updatedCustomer = await updateCustomer(selectedCustomer.id, customerData);
+      const updatedCustomer = await updateCustomer(user, selectedCustomer.id, customerData);
       const updatedData = dataSource.map((item) =>
         item.id === updatedCustomer.id ? updatedCustomer : item
       );
       setDataSource(updatedData);
     } else {
-      const newCustomer = await addCustomer(user, customerData); // Include user to maintain permission checks
+      const newCustomer = await addCustomer(user, customerData);
       setDataSource([...dataSource, newCustomer]);
     }
     handleModalCancel();
   };
+
+  const handleResetFilter = () => {
+    setTempFilters({
+      role: null,
+      status: null,
+    });
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    setFilterVisible(false);
+  };
+
+  const filteredData = dataSource.filter((item) => {
+    const { role, status } = filters;
+    return (
+      (role ? item.role === role : true) &&
+      (status ? item.status === status : true)
+    );
+  });
 
   const menu = (record) => (
     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
@@ -91,25 +129,25 @@ const Customers = ({ user }) => {
         Edit
       </Button>
       <Popconfirm
-        title="Are you sure you want to delete this customer?"
-        onConfirm={() => handleDeleteCustomer(record.id)} // Changed from userId to id
+        title={`Are you sure you want to ${record.status === 'Active' ? 'Ban' : 'Unban'} this customer?`}
+        onConfirm={() => handleToggleStatus(record)}
         okText="Yes"
         cancelText="No"
       >
         <Button 
           type="link" 
           icon={<DeleteOutlined />} 
-          style={{ color: 'red', padding: 0, textAlign: 'left' }} 
+          style={{ color: record.status === 'Active' ? 'red' : 'green', padding: 0, textAlign: 'left' }} 
           disabled={user.role !== 'admin'}
         >
-          Delete
+          {record.status === 'Active' ? 'Ban' : 'Unban'}
         </Button>
       </Popconfirm>
     </div>
   );
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id' }, // Changed from userId to id
+    { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     {
@@ -117,6 +155,12 @@ const Customers = ({ user }) => {
       dataIndex: 'role',
       key: 'role',
       render: (role) => (role === 'user' ? 'User' : role === 'host' ? 'Host' : 'Unknown'),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (status === 'Active' ? 'Active' : 'Banned'),
     },
     {
       title: 'Action',
@@ -136,19 +180,84 @@ const Customers = ({ user }) => {
     },
   ];
 
+  const filterMenu = (
+    <Menu>
+      <div className="filter-title">Filter Customers</div>
+  
+      <Menu.Item key="role">
+        <div className="filter-section">
+          <div className="filter-label">Role</div>
+          <Select
+            value={tempFilters.role}
+            onChange={(value) => setTempFilters({ ...tempFilters, role: value })}
+            placeholder="Select Role"
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Option value="user">User</Option>
+            <Option value="host">Host</Option>
+          </Select>
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="status">
+        <div className="filter-section">
+          <div className="filter-label">Status</div>
+          <Select
+            value={tempFilters.status}
+            onChange={(value) => setTempFilters({ ...tempFilters, status: value })}
+            placeholder="Select Status"
+            style={{ width: '100%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Option value="Active">Active</Option>
+            <Option value="Ban">Ban</Option>
+          </Select>
+        </div>
+      </Menu.Item>
+  
+      <Menu.Item key="filter-buttons">
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Button onClick={handleResetFilter}>Reset</Button>
+          <Button type="primary" onClick={applyFilters}>Apply Filter</Button>
+        </div>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div className="table-container">
       <div className="table-header">
         <h3>Customer List</h3>
         <Space>
           <Input.Search placeholder="Search customers..." style={{ width: 200 }} />
+          <Dropdown   
+            overlay={filterMenu}
+            visible={filterVisible}
+            onVisibleChange={(visible) => setFilterVisible(visible)}
+            trigger={['click']}
+            overlayStyle={{ zIndex: 1050 }}
+            dropdownRender={(menu) => (
+              <div onMouseDown={(e) => e.stopPropagation()}>{menu}</div>
+            )}
+          >
+            <Button type="primary" icon={<FilterOutlined />}>
+              Filter
+            </Button>
+          </Dropdown>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCustomer}>
             Add Customer
           </Button>
         </Space>
       </div>
-      <Table dataSource={dataSource} columns={columns} pagination={{ pageSize: 10 }} 
- />
+      <Table 
+        dataSource={filteredData} 
+        columns={columns} 
+        pagination={{ pageSize: 10 }}         
+        onRow={(record) => ({
+          onDoubleClick: () => navigate(`/admin/customer-manager/${record.id}`)
+        })}        
+      />
 
       <Modal
         title={selectedCustomer ? 'Edit Customer' : 'Add Customer'}
@@ -172,12 +281,18 @@ const Customers = ({ user }) => {
               <Option value="host">Host</Option>
             </Select>
           </Form.Item>
+          <Form.Item label="Status" name="status" initialValue="Active">
+            <Select>
+              <Option value="Active">Active</Option>
+              <Option value="Ban">Ban</Option>
+            </Select>
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               {selectedCustomer ? 'Save Changes' : 'Add Customer'}
             </Button>
           </Form.Item>
-        </Form>
+        </Form> 
       </Modal>
     </div>
   );

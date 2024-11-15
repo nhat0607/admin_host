@@ -6,6 +6,10 @@ const ProtectedRoute = ({ children, user }) => {
     return <Navigate to="/" replace />;
   }
 
+  if (user.status === 'Ban') {
+    return <Navigate to="/banned" />;
+  }
+
   return children;
 };
 

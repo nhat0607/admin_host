@@ -80,9 +80,9 @@ const Setting = ({ user }) => {
               <Input placeholder="Enter hotel name" />
             </Form.Item>
 
-            <Form.Item label="Hotel Logo" name="logo">
+            <Form.Item label="Hotel Image" name="logo">
               <Upload beforeUpload={handleLogoUpload} listType="picture">
-                <Button icon={<UploadOutlined />}>Upload Logo</Button>
+                <Button icon={<UploadOutlined />}>Upload Image</Button>
               </Upload>
             </Form.Item>
 

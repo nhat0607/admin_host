@@ -7,6 +7,7 @@ import Room from './Room';
 import Promotion from './Promotion'; 
 import Payment from './Payment'; 
 import Setting from './Setting';
+import RatingReview from './Ratingreview';
 import CustomHeader from '../components/Header';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import '../App.css';
@@ -29,7 +30,7 @@ const HostSidebar = ({ user }) => {
           type='text'
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => setCollapsed(!collapsed)}
-          className='triger-btn'
+          className='trigger-btn'
         />
       </Sider>
       <Layout>
@@ -41,8 +42,9 @@ const HostSidebar = ({ user }) => {
           {selectedMenuItem === '2' && <Booking user={user} />}
           {selectedMenuItem === '3' && <Room user={user} />}
           {selectedMenuItem === '4' && <Promotion user={user} />}
-          {selectedMenuItem === '5' && <Payment user={user} />}
-          {selectedMenuItem === '6' && <Setting user={user} />} 
+          {selectedMenuItem === '5' && <RatingReview user={user} />}
+          {selectedMenuItem === '6' && <Payment user={user} />}
+          {selectedMenuItem === '7' && <Setting user={user} />} 
         </Content>
       </Layout>
     </Layout>

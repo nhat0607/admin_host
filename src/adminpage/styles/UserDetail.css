@@ -1,0 +1,45 @@
+.user-detail-container {
+    padding: 24px;
+  }
+  
+  .menu {
+    margin-bottom: 16px;
+  }
+  
+  .back-button {
+    color: #1890ff;
+  }
+  
+  .form-container {
+    background-color: #f9f9f9;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-title, .section-title {
+    margin-bottom: 16px;
+  }
+  
+  .form-field {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+  
+  .form-label {
+    padding-left: 10px;
+    width: 100px;
+    font-weight: bold;
+  }
+  
+  .form-value {
+    flex: 1;
+  }
+  
+  .booking-table {
+    margin-top: 16px;
+  }
+  

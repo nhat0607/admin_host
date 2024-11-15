@@ -42,18 +42,18 @@
 }
 
 .ant-table-tbody > tr:hover {
-    background-color: #fafafa;
+    background-color: #e5f7fa; /* Updated to a light shade of #06b3c4 */
 }
 
 .ant-btn-primary {
-    background-color: #52c41a;
-    border-color: #52c41a;
+    background-color: #06b3c4; /* Updated */
+    border-color: #06b3c4; /* Updated */
 }
 
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
-    background-color: #389e0d;
-    border-color: #389e0d;
+    background-color: #046e7a; /* Darker shade of #06b3c4 */
+    border-color: #046e7a; /* Darker shade */
 }
 
 .ant-input-search {
@@ -62,12 +62,12 @@
 
 .ant-input-search-button {
     border-radius: 4px;
-    background-color: #1890ff;
+    background-color: #06b3c4; /* Updated */
 }
 
 .ant-input-search-button:hover,
 .ant-input-search-button:focus {
-    background-color: #40a9ff;
+    background-color: #7fd6dd; /* Lighter shade of #06b3c4 */
 }
 
 .ant-modal {
@@ -107,7 +107,6 @@
     font-weight: bold;
 }
 
-
 .ant-popover {
     text-align: left; 
 }
@@ -128,14 +127,42 @@
 }
 
 .ant-popover .ant-popover-item:hover {
-    background-color: #e6f7ff; 
+    background-color: #e6f7ff; /* Lighter shade of #06b3c4 */
 }
 
 .ant-picker {
     width: 100%; 
     border-radius: 4px; 
-  }
+}
 
 .ant-picker-suffix {
     color: rgba(0, 0, 0, 0.45); 
+}
+
+.filter-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding: 10px 0 0 10px;
+}
+  
+.filter-section {
+    margin-bottom: 16px;
+    width: 270px;
+    border: none;
+}
+  
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.no-border {
+    border: none;
+}
+
+.ant-form-item-control-input-content > div[style] {
+    border: none !important;
 }

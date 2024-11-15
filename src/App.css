@@ -9,7 +9,7 @@
   padding: 20px;
 }
 
-.triger-btn {
+.trigger-btn {
   font-size: 16px;
   width: 50px;
   height: 50px;
@@ -27,7 +27,7 @@
 }
 
 .logo {
-  color: #4f6f52;
+  color: #06b3c4; /* Updated to new color */
   margin: 40px 0;
   font-size: 1.5rem;
 
@@ -41,7 +41,7 @@
 }
 
 .ant-menu-item-selected {
-  background-color: #4f6f52 !important;
+  background-color: #06b3c4 !important; /* Updated to new color */
   color: #fff !important;
 }
 
@@ -50,49 +50,48 @@
   padding: 8px;
   border-radius: 4px;
   font-size: 15px;
-  color: #4f6f52;
+  color: #06b3c4; /* Updated to new color */
   cursor: pointer;
 }
 
 .header-icon:hover {
-  background: #d2e3c8;
+  background: #b3e7ec; /* Updated to a lighter shade of new color */
 }
 
 /* button and color */
 .ant-btn:hover {
-  color: #4f6f52 !important;
-  border-color: #4f6f52 !important;
+  color: #06b3c4 !important; /* Updated to new color */
+  border-color: #06b3c4 !important; /* Updated to new color */
 }
 
 .ant-btn-primary {
-  background-color: #4f6f52;
+  background-color: #06b3c4; /* Updated to new color */
 }
 
 .ant-btn-primary:hover {
-  background-color: #173a1a !important;
+  background-color: #046e7a !important; /* Darker shade of new color */
   color: #fff !important;
 }
 
 .primary--color {
-  color: #4f6f52 !important;
+  color: #06b3c4 !important; /* Updated to new color */
 }
 
 .primary--light--color {
-  color: #739072 !important;
+  color: #7fd6dd !important; /* Updated to a lighter shade */
 }
 
 .secondary--color {
-  color: #86a789 !important;
+  color: #a9e1e6 !important; /* Updated to a lighter shade */
 }
 
 .ligh--color {
-  color: #d2e3c8 !important;
+  color: #b3e7ec !important; /* Updated to a lighter shade */
 }
 
 .gray--color {
   color: rgb(182, 181, 181) !important;
 }
-
 
 /* components */
 .components {
@@ -105,8 +104,3 @@
   border: 1px solid #ddd;
   border-radius: 5px;
 }
-
-
-
-
-

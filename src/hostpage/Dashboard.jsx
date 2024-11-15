@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Spin, message, Row, Col, Card } from 'antd';
+import { Typography, Spin, message, Row, Col, Card, Select } from 'antd';
 import { FaCalendarAlt, FaBed, FaMoneyBillWave } from 'react-icons/fa';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { getBookingsByHotelId, getRoomTypeByBookingId, getTotalAndAvailableRooms } from '../api/api';
@@ -17,6 +17,7 @@ const Dashboard = ({ user }) => {
   const [incomeData, setIncomeData] = useState({ labels: [], datasets: [] });
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [weeklyIncome, setWeeklyIncome] = useState(0);
+  const [view, setView] = useState("1 month");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -65,43 +66,50 @@ const Dashboard = ({ user }) => {
           ]
         });
 
-        const incomeCounts = {};
-        const dailyIncomeCounts = {};
-        const today = moment();
+        // Handle income data based on view
+        let incomeCounts = {};
+        let labelsForChart = [];
 
-        for (let i = 0; i < 30; i++) {
-          const day = today.clone().subtract(i, 'days').format('YYYY-MM-DD');
-          incomeCounts[day] = 0;
-          dailyIncomeCounts[day] = day; 
+        if (view === "1 month") {
+          // Last 30 days data
+          const today = moment();
+          labelsForChart = Array.from({ length: 30 }, (_, i) =>
+            today.clone().subtract(i, 'days').format('YYYY-MM-DD')
+          ).reverse();
+
+          incomeCounts = labelsForChart.reduce((acc, date) => ({ ...acc, [date]: 0 }), {});
+          
+          bookings.forEach(booking => {
+            const checkInDate = moment(booking.checkInDate).format('YYYY-MM-DD');
+            if (incomeCounts[checkInDate] !== undefined) {
+              incomeCounts[checkInDate] += booking.totalPrice;
+            }
+          });
+          
+        } else if (view === "1 year") {
+          // Last 12 months data
+          const today = moment();
+          labelsForChart = Array.from({ length: 12 }, (_, i) =>
+            today.clone().subtract(i, 'months').format('MMMM YYYY')
+          ).reverse();
+
+          incomeCounts = labelsForChart.reduce((acc, month) => ({ ...acc, [month]: 0 }), {});
+
+          bookings.forEach(booking => {
+            const checkInMonth = moment(booking.checkInDate).format('MMMM YYYY');
+            if (incomeCounts[checkInMonth] !== undefined) {
+              incomeCounts[checkInMonth] += booking.totalPrice;
+            }
+          });
         }
 
-        bookings.forEach(booking => {
-          const checkInDate = moment(booking.checkInDate).format('YYYY-MM-DD');
-          const checkInMonth = moment(booking.checkInDate).format('MMMM YYYY');
-          
-          if (incomeCounts[checkInDate] !== undefined) {
-            incomeCounts[checkInDate] += booking.totalPrice;
-          }
-          
-          if (checkInMonth === moment().format('MMMM YYYY')) {
-            setMonthlyIncome(prev => prev + booking.totalPrice);
-          }
-
-          const startOfWeek = moment().startOf('week').format('YYYY-MM-DD');
-          const endOfWeek = moment().endOf('week').format('YYYY-MM-DD');
-          if (moment(checkInDate).isBetween(startOfWeek, endOfWeek, null, '[]')) {
-            setWeeklyIncome(prev => prev + booking.totalPrice);
-          }
-        });
-
-        const incomeLabels = Object.keys(dailyIncomeCounts).reverse();
-        const dailyIncomeValues = incomeLabels.map(label => incomeCounts[label] || 0);
+        const incomeValues = labelsForChart.map(label => incomeCounts[label] || 0);
 
         setIncomeData({
-          labels: incomeLabels,
+          labels: labelsForChart,
           datasets: [{
-            label: 'Daily Income',
-            data: dailyIncomeValues,
+            label: view === "1 month" ? 'Daily Income' : 'Monthly Income',
+            data: incomeValues,
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1
@@ -116,7 +124,7 @@ const Dashboard = ({ user }) => {
     };
 
     fetchDashboardData();
-  }, [user]);
+  }, [user, view]);
 
 
   return (
@@ -190,8 +198,18 @@ const Dashboard = ({ user }) => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={16}>
-              <Card title="Daily Income Over Last 30 Days" bordered={false} style={{ height: '100%' }}>
+          <Col span={16}>
+              <Card
+                title="Income Over Last 30 Days"
+                extra={
+                  <Select defaultValue="1 month" onChange={value => setView(value)}>
+                    <Option value="1 month">1 Month</Option>
+                    <Option value="1 year">1 Year</Option>
+                  </Select>
+                }
+                bordered={false}
+                style={{ height: '100%' }}
+              >
                 <Bar
                   data={incomeData}
                   options={{
@@ -208,7 +226,7 @@ const Dashboard = ({ user }) => {
                       x: {
                         title: {
                           display: true,
-                          text: 'Date',
+                          text: view === "1 month" ? 'Date' : 'Month',
                         },
                       },
                     },
