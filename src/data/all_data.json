@@ -665,7 +665,7 @@
       "currency": "EUR",
       "capacity": 3,
       "quantity": 8,
-      "available": 7786,
+      "available": 6,
       "status": "Allow",
       "amenities": [
         "WiFi",
@@ -730,7 +730,7 @@
       "price": 150,
       "capacity": 1,
       "quantity": 20,
-      "available": 37686,
+      "available": 17,
       "status": "Allow",
       "hotelId": "h1001"
     },
@@ -740,7 +740,7 @@
       "price": 250,
       "capacity": 2,
       "quantity": 20,
-      "available": 55309,
+      "available": 16,
       "status": "Allow",
       "hotelId": "h1001"
     },
@@ -884,6 +884,24 @@
       "status": "Active",
       "userId": "H7427",
       "hotelId": "H4082"
+    },
+    {
+      "id": "38bc",
+      "name": "Mitchell Admin",
+      "email": "tiennhat4902@gmail.com",
+      "password": "nhatprotk0",
+      "role": "customer",
+      "status": "Active",
+      "userId": "H7361"
+    },
+    {
+      "id": "fcbc",
+      "name": "Mitchell Admin",
+      "email": "tiennhat4902@gmail.com",
+      "password": "nhatprotk0",
+      "role": "customer",
+      "status": "Active",
+      "userId": "H7986"
     }
   ],
   "settings": [

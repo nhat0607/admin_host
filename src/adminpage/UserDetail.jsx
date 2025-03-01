@@ -1,43 +1,80 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Typography, Divider, Table, Input, Card } from 'antd';
-import { getCustomers } from '../api/api'; // Assuming getCustomers fetches all customer data
+import { Button, Typography, Divider, Table, Input, Card, Rate } from 'antd';
+import { getCustomers, getBookingsByUser, getHotelByHost, getCustomerTransactions } from '../api/api';
 
 const { Title } = Typography;
 
 const UserDetail = () => {
-  const { userid } = useParams(); // Get the user ID from route parameters
+  const { userid } = useParams();
   const navigate = useNavigate();
   const [customer, setCustomer] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [hotel, setHotel] = useState(null);
 
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const customers = await getCustomers(); // Fetch all customers
-        const customerData = customers.find((customer) => String(customer.id) === String(userid)); 
+        const customers = await getCustomers();
+        const customerData = customers.find((customer) => String(customer._id) === String(userid));
         setCustomer(customerData);
+
+        if (customerData.role === 'customer') {
+          const userBookings = await getBookingsByUser(customerData._id);
+          const sortedBookings = userBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          setBookings(sortedBookings);
+        } else {
+          const userHotel = await getHotelByHost(customerData._id);
+          setHotel(userHotel[0]);
+        }
       } catch (error) {
-        console.error("Error fetching customer:", error); 
+        console.error('Error fetching customer or bookings:', error);
       }
     };
-
     fetchCustomer();
   }, [userid]);
 
-  if (!customer) return <div>Loading...</div>; // Add a loading state
+  if (!customer) return <div>Loading...</div>;
 
-  // Table columns for booking IDs
   const columns = [
     {
-      title: 'Booking ID',
-      dataIndex: 'bookingId',
-      key: 'bookingId',
+      title: 'Hotel Name',
+      dataIndex: ['room', 'hotel', 'name'],
+      key: 'hotelName',
+    },
+    {
+      title: 'Room Number',
+      dataIndex: ['room', 'roomNumber'],
+      key: 'roomNumber',
+    },
+    {
+      title: 'Check-In Date',
+      dataIndex: 'checkInDate',
+      key: 'checkInDate',
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Check-Out Date',
+      dataIndex: 'checkOutDate',
+      key: 'checkOutDate',
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        const statusColors = {
+          CANCELLED: 'red',
+          BOOKED: 'yellow',
+          COMPLETED: 'green',
+        };
+        const upperCaseStatus = status?.toUpperCase();
+        const color = statusColors[upperCaseStatus] || 'black';
+        return <span style={{ color, fontWeight: '600' }}>{upperCaseStatus}</span>;
+      },
     },
   ];
-
-  const bookingData = customer.bookingIds
-    ? customer.bookingIds.map((id) => ({ key: id, bookingId: id }))
-    : [];
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
@@ -49,14 +86,11 @@ const UserDetail = () => {
 
           <Divider />
 
-          {/* User Detail Section */}
           <Title level={4}>User Detail</Title>
-
-          {/* CSS Grid Layout for User Detail */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', paddingInlineStart: '20px' }}>
             <div className="form-field">
               <span className="form-label">ID:</span>
-              <Input className="form-value" value={customer.id} readOnly />
+              <Input className="form-value" value={customer._id} readOnly />
             </div>
             <div className="form-field">
               <span className="form-label">Name:</span>
@@ -67,34 +101,79 @@ const UserDetail = () => {
               <Input className="form-value" value={customer.email} readOnly />
             </div>
             <div className="form-field">
-              <span className="form-label">Password:</span>
-              <Input className="form-value" value={customer.password} readOnly />
+              <span className="form-label">Email Status:</span>
+              <br /> {/* Thêm dòng trống sau nhãn */}
+              <span
+                style={{
+                  color: customer.statusemail === 'verify' ? 'green' : 'red',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  paddingLeft: 7,
+                }}
+              >
+                {customer.statusemail}
+              </span>
+            </div>
+            <div className="form-field">
+              <span className="form-label">Phone Number:</span>
+              <Input className="form-value" value={customer.phonenumber} readOnly />
+            </div>
+            <div className="form-field">
+              <span className="form-label">Country:</span>
+              <Input className="form-value" value={customer.country} readOnly />
             </div>
           </div>
 
           <Divider />
 
-          {/* Conditional Section */}
-          <Title level={4}>
-            {customer.role === 'user' ? 'Booking History' : 'Hotel Information'}
-          </Title>
+          <Title level={4}>{customer.role === 'customer' ? 'Booking History' : 'Hotel Information'}</Title>
 
-          {customer.role === 'user' ? (
-            <Table
-              className="booking-table"
-              columns={columns}
-              dataSource={bookingData}
-              pagination={false}
-              bordered
-              scroll={{ y: 180 }} // Set a fixed height for vertical scrolling
-            />
+          {customer.role === 'customer' ? (
+            bookings.length > 0 ? (
+              <Table
+                className="booking-table"
+                columns={columns}
+                dataSource={bookings}
+                pagination={false}
+                bordered
+                scroll={{ y: 180 }}
+                rowKey="_id"
+                style={{ width: '100%' }}
+              />
+            ) : (
+              <div style={{ textAlign: 'center', marginTop: '20px', fontWeight: '500' }}>
+                No booking history available
+              </div>
+            )
           ) : (
-            <div className="form-field">
-              <span className="form-label">Hotel ID:</span>
-              <Input className="form-value" value={customer.hotelId || 'N/A'} readOnly />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '0 20px' }}>
+              <div className="form-field">
+                <span className="form-label">Hotel ID:</span>
+                <Input className="form-value" value={hotel?.hotelId || 'N/A'} readOnly />
+              </div>
+              <div className="form-field">
+                <span className="form-label">Hotel Name:</span>
+                <Input className="form-value" value={hotel?.name || 'N/A'} readOnly />
+              </div>
+              <div className="form-field">
+                <span className="form-label">Location:</span>
+                <Input
+                  className="form-value"
+                  value={`${hotel?.location?.city || ''}, ${hotel?.location?.country || ''}` || 'N/A'}
+                  readOnly
+                />
+              </div>
+              <div className="form-field">
+                <span className="form-label">Amenities:</span>
+                <Input className="form-value" value={hotel?.amenities?.join(', ') || 'N/A'} readOnly />
+              </div>
+              <div className="form-field">
+                <span className="form-label">Rating:</span>
+                <Rate disabled value={hotel?.rating || 0} />
+              </div>
             </div>
-          )}
-        </Card>
+          )}        
+          </Card>
       </div>
     </div>
   );

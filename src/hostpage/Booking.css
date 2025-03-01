@@ -1,0 +1,26 @@
+/* Custom modal container */
+.custom-modal {
+    max-width: 600px;
+    margin-top: 7%;
+  }
+  
+  /* Title styles */
+.modal-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Paragraph styles */
+  .ant-modal-body p {
+    font-size: 16px;
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+  }
+  
+  /* Strong text within paragraphs */
+  .modal-paragraph strong {
+    font-weight: 600;
+    color: #000;
+  }

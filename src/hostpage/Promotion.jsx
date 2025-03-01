@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm, Popover } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { getPromotionsByHotelId, addPromotion, updatePromotion, deletePromotion } from '../api/api'; 
+
 
 const Promotion = ({ user }) => {
   const [promotionData, setPromotionData] = useState([]);
@@ -10,15 +10,15 @@ const Promotion = ({ user }) => {
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState({});
 
-  useEffect(() => {
-    const fetchPromotions = async () => {
-      if (user && user.hotelId) {
-        const promotions = await getPromotionsByHotelId(user);
-        setPromotionData(promotions);
-      }
-    };
-    fetchPromotions();
-  }, [user]);
+  // useEffect(() => {
+  //   const fetchPromotions = async () => {
+  //     if (user && user.hotelId) {
+  //       const promotions = await getPromotionsByHotelId(user);
+  //       setPromotionData(promotions);
+  //     }
+  //   };
+  //   fetchPromotions();
+  // }, [user]);
 
   const handleAddPromotion = () => {
     setSelectedPromotion(null);
@@ -33,35 +33,35 @@ const Promotion = ({ user }) => {
     setPopoverVisible((prev) => ({ ...prev, [record.promotionId]: false }));
   };
 
-  const handleDeletePromotion = async (id) => {
-    await deletePromotion(user, id);
-    const updatedData = promotionData.filter((item) => item.promotionId !== id); 
-    setPromotionData(updatedData);
-    setPopoverVisible((prev) => ({ ...prev, [id]: false })); 
-  };
+  // const handleDeletePromotion = async (id) => {
+  //   await deletePromotion(user, id);
+  //   const updatedData = promotionData.filter((item) => item.promotionId !== id); 
+  //   setPromotionData(updatedData);
+  //   setPopoverVisible((prev) => ({ ...prev, [id]: false })); 
+  // };
 
   const handleModalCancel = () => {
     setModalVisible(false);
     setSelectedPromotion(null);
   };
 
-  const handleFormSubmit = async (values) => {
-    try {
-      if (selectedPromotion) {
-        const updatedPromotion = await updatePromotion(user, selectedPromotion.promotionId, values);
-        const updatedData = promotionData.map((item) =>
-          item.promotionId === selectedPromotion.promotionId ? { ...item, ...updatedPromotion } : item
-        );
-        setPromotionData(updatedData);
-      } else {
-        const newPromotion = await addPromotion(user, values);
-        setPromotionData([...promotionData, newPromotion]);
-      }
-      handleModalCancel();
-    } catch (error) {
-      alert(error.message); 
-    }
-  };
+  // const handleFormSubmit = async (values) => {
+  //   try {
+  //     if (selectedPromotion) {
+  //       const updatedPromotion = await updatePromotion(user, selectedPromotion.promotionId, values);
+  //       const updatedData = promotionData.map((item) =>
+  //         item.promotionId === selectedPromotion.promotionId ? { ...item, ...updatedPromotion } : item
+  //       );
+  //       setPromotionData(updatedData);
+  //     } else {
+  //       const newPromotion = await addPromotion(user, values);
+  //       setPromotionData([...promotionData, newPromotion]);
+  //     }
+  //     handleModalCancel();
+  //   } catch (error) {
+  //     alert(error.message); 
+  //   }
+  // };
 
   const menu = (record) => (
     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
@@ -73,7 +73,7 @@ const Promotion = ({ user }) => {
       >
         Edit
       </Button>
-      <Popconfirm
+      {/* <Popconfirm
         title="Are you sure you want to delete this promotion?"
         onConfirm={() => handleDeletePromotion(record.promotionId)}
         okText="Yes"
@@ -82,7 +82,7 @@ const Promotion = ({ user }) => {
         <Button type="link" icon={<DeleteOutlined />} style={{ color: 'red', padding: 0, textAlign: 'left' }}>
           Delete
         </Button>
-      </Popconfirm>
+      </Popconfirm> */}
     </div>
   );
 
@@ -124,7 +124,7 @@ const Promotion = ({ user }) => {
         pagination={{ pageSize: 10 }} 
       />
 
-      <Modal
+      {/* <Modal
         title={selectedPromotion ? 'Edit Promotion' : 'Add Promotion'}
         open={isModalVisible}
         onCancel={handleModalCancel}
@@ -146,7 +146,7 @@ const Promotion = ({ user }) => {
             </Button>
           </Form.Item>
         </Form>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

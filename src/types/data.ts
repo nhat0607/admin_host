@@ -30,11 +30,10 @@ export type Hotel = {
     images: string[];
   };
   
-  export type Role = "admin" | "host" | "user";
+  export type Role = "admin" | "hotelOwner" | "customer";
   
   export type User = {
     id: string;
-    userId: string;
     name: string;
     email: string;
     password: string;

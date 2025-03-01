@@ -4,11 +4,11 @@ import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Popconfirm
 import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined, FilterOutlined } from '@ant-design/icons';
 import { getCustomers, addCustomer, updateCustomer } from '../api/api'; 
 import '../hostpage/Components.css';
-import './styles/accountManagement.css';
+import './styles/Pending.css'
 
 const { Option } = Select;
 
-const Customers = ({ user }) => {
+const PendingAccounts = ({ user }) => {
   const [dataSource, setDataSource] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -26,18 +26,10 @@ const Customers = ({ user }) => {
 
   // Fetch customer data
   const fetchCustomers = async () => {
-    try {
-      const customers = await getCustomers();
-      const customersdata =  customers.filter((customer) => customer.role !== 'admin' && customer.statusaccount !== 'pending');
-      const sortedCustomers = customersdata.sort((a, b) => {
-        const dateA = new Date(a.createdAt); 
-        const dateB = new Date(b.createdAt);
-        return dateB - dateA; 
-      });
-      setDataSource(sortedCustomers);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
+    const customers = await getCustomers();
+    // console.log(user.token);
+    console.log(customers);
+    setDataSource(customers.filter((customer) => customer.role === 'hotelOwner' && customer.statusaccount === 'pending'));
   };
 
   // Call fetchCustomers when component mounts
@@ -45,69 +37,58 @@ const Customers = ({ user }) => {
     fetchCustomers();
   }, []);
 
-  const handleAddCustomer = () => {
-    if (user.role === 'admin') {
-      setSelectedCustomer(null);
-      setModalVisible(true);
-      form.resetFields();
-    } else {
-      alert("You do not have permission to add customers.");
+  const handleAcceptCustomer = async (record) => {
+    try {
+      // Logic to accept the customer's account
+      console.log(`Accepting customer with id: ${record._id}`);
+      await updateCustomer(user, record._id, { statusaccount: 'active' });
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error accepting customer:', error);
     }
   };
 
-  const handleEditCustomer = (record) => {
-    if (user.role === 'admin') {
-      setSelectedCustomer(record);
-      setModalVisible(true);
-      form.setFieldsValue(record);
-      setPopoverVisible((prev) => ({ ...prev, [record._id]: false }));
-    } else {
-      alert("You do not have permission to edit customers.");
+  const handleDeclineCustomer = async (record) => {
+    try {
+      // Logic to decline the customer's account
+      console.log(`Declining customer with id: ${record._id}`);
+      await updateCustomer(user, record._id, { statusaccount: 'declined' });
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error declining customer:', error);
     }
   };
+
 
   const handleModalCancel = () => {
     setModalVisible(false);
     setSelectedCustomer(null);
   };
 
-  const handleFormSubmit = async (values) => {
-    const role = values.role;
-    const status = values.status || 'Active';
+// const handleFormSubmit = async (values) => {
+//   const role = values.role;
+//   const status = values.status || 'Active';
 
-    const customerData = {
-      ...values,
-      role,
-      status,
-    };
+//   const customerData = {
+//     ...values,
+//     role,
+//     status,
+//   };
 
-    try {
-      if (selectedCustomer) {
-        await updateCustomer(user, selectedCustomer._id, customerData);
-        await fetchCustomers();
-      } else {
-        await addCustomer(user, customerData);
-        await fetchCustomers();
-      }
-    } catch (error) {
-      console.error('Error saving customer data:', error);
-    }
-    
-    handleModalCancel();
-  };
-
-  const handleToggleStatus = async (record) => {
-    try {
-      const newStatus = record.statusaccount === 'active' ? 'ban' : 'active';
-      await updateCustomer(user, record._id, { statusaccount: newStatus });
-      const updatedData = dataSource.map((item) =>
-        item._id === record._id ? { ...item, statusaccount: newStatus } : item
-      );
-      setDataSource(updatedData);
-    } catch (error) {
-      console.error('Error toggling customer status:', error);
-    }
-  };
+//   try {
+//     if (selectedCustomer) {
+//       const updatedCustomer = await updateCustomer(user, selectedCustomer._id, customerData);
+//       await fetchCustomers();
+//     } else {
+//       const newCustomer = await addCustomer(user, customerData);
+//       await fetchCustomers();
+//     }
+//   } catch (error) {
+//     console.error('Error saving customer data:', error);
+//   }
+  
+//   handleModalCancel(); // Đóng modal
+// };
 
   const handleResetFilter = () => {
     setTempFilters({
@@ -137,7 +118,7 @@ const Customers = ({ user }) => {
         Edit
       </Button>
       <Popconfirm
-        title={`Are you sure you want to ${record.statusaccount === 'active' ? 'Ban' : 'Unban'} this customer?`}
+        title={`Are you sure you want to ${record.status === 'Active' ? 'Ban' : 'Unban'} this customer?`}
         onConfirm={() => handleToggleStatus(record)}
         okText="Yes"
         cancelText="No"
@@ -145,10 +126,10 @@ const Customers = ({ user }) => {
         <Button 
           type="link" 
           icon={<DeleteOutlined />} 
-          style={{ color: record.statusaccount === 'active' ? 'red' : 'green', padding: 0, textAlign: 'left' }} 
+          style={{ color: record.status === 'Active' ? 'red' : 'green', padding: 0, textAlign: 'left' }} 
           disabled={user.role !== 'admin'}
         >
-          {record.statusaccount === 'active' ? 'Ban' : 'Unban'}
+          {record.status === 'Active' ? 'Ban' : 'Unban'}
         </Button>
       </Popconfirm>
     </div>
@@ -168,7 +149,6 @@ const Customers = ({ user }) => {
         return 'Unknown';
       },
     },
-    // { title: 'Email Verify', dataIndex: 'statusemail', key: 'statusemail' },
     {
       title: 'Status',
       dataIndex: 'statusaccount',
@@ -177,6 +157,7 @@ const Customers = ({ user }) => {
         // Map trạng thái sang màu sắc
         const statusColors = {
           ACTIVE: 'green',
+          PENDING: 'orange',
           BAN: 'red',
         };
     
@@ -195,22 +176,14 @@ const Customers = ({ user }) => {
         title: 'Action',
         key: 'action',
         render: (_, record) => (
-          <Popconfirm
-            title={`Are you sure you want to ${record.statusaccount === 'active' ? 'Ban' : 'Unban'} this customer?`}
-            onConfirm={() => handleToggleStatus(record)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Space>
-              <Button
-                type="primary"
-                className={`btn-status ${record.statusaccount === 'active' ? 'btn-active' : 'btn-inactive'}`}
-                disabled={user.role !== 'admin'}
-              >
-                {record.statusaccount === 'active' ? 'Ban' : 'Unban'}
-              </Button>
-            </Space>
-          </Popconfirm>
+          <Space>
+            <Button type="primary" className='btn-accept' onClick={() => handleAcceptCustomer(record)}>
+              Accept
+            </Button>
+            <Button type="danger" className='btn-decline' onClick={() => handleDeclineCustomer(record)}>
+              Decline
+            </Button>
+          </Space>
         ),
     },
   ];
@@ -282,7 +255,7 @@ const Customers = ({ user }) => {
       />
 
 
-      <Modal
+      {/* <Modal
         title={selectedCustomer ? 'Edit Customer' : 'Add Customer'}
         open={isModalVisible}
         onCancel={handleModalCancel}
@@ -311,9 +284,9 @@ const Customers = ({ user }) => {
             </Button>
           </Form.Item>
         </Form> 
-      </Modal>
+      </Modal> */}
     </div>
   );
 };
 
-export default Customers;
+export default PendingAccounts;

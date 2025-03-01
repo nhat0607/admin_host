@@ -12,108 +12,82 @@ import {
 } from '../types/data';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:4000";
+
+const API_SERVER_URL = "http://localhost:5000/api";
 
 const isAdmin = (user: User | null): boolean => {
     return user?.role === 'admin';
 };
 
 const isHost = (user: User | null): boolean => {
-    return user?.role === 'host';
+    return user?.role === 'hotelOwner';
 };
 
-export const login = async (email: string, password: string): Promise<User | null> => {
+export const login = async (email: string, password: string) => {
     try {
-        const response = await axios.get<User[]>(`${API_BASE_URL}/users`, {
-            params: { email, password },
+        const response = await axios.post(`${API_SERVER_URL}/auth/login`, {
+          email,
+          password,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-        const user = response.data[0];
-        return user || null;
-    } catch (error) {
-        console.error('Login failed:', error);
-        return null;
+
+        const token = response.data.token;
+        if (token) {
+            localStorage.setItem('token', token);
+        }
+        return response.data;
+    } catch (error: any) {
+        if (error.response) {
+            console.error('Login error:', error.response.data); // Xem thông tin trả về từ server
+            return error.response.data; // Trả về phản hồi lỗi thay vì `null`
+        }
+        console.error('Unexpected error:', error.message);
+        return { success: false, message: 'Unexpected error occurred' };
     }
 };
 
 export const getCustomers = async (): Promise<User[]> => {
     try {
-        const response = await axios.get<User[]>(`${API_BASE_URL}/users`);
+        const response = await axios.get<User[]>(`${API_SERVER_URL}/users/all`);
         return response.data;
     } catch (error) {
-        console.error('Failed to fetch customers:', error);
+        // Kiểm tra chi tiết lỗi
+        if (axios.isAxiosError(error)) {
+            console.error('Failed to fetch customers:', error.response?.data || error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
         return [];
     }
 };
 
-export const getHost = async (): Promise<User[]> => { 
-    try {
-        const response = await axios.get(`${API_BASE_URL}/users`);
-        const users = response.data; 
 
-        const hosts: User[] = []; 
-        for (const user of users) {
-            if (user.role === 'host') {
-                hosts.push(user);
+export const addCustomer = async (adminUser: User | null, customer: { name: string; email: string; password: string; role: string; }): Promise<User> => {
+    try {
+        if (!adminUser || adminUser.role !== 'admin') {
+            throw new Error('Not authorized to add new users');
+        }
+
+        const { name, email, password, role } = customer;
+        const newUser = { name, email, password, role };
+    
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Not authorized, no token');
+        }
+
+        const response = await axios.post<User>(`${API_SERVER_URL}/users/adduser`, newUser, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
             }
-        }
-
-        return hosts; 
-    } catch (error) {
-        console.error('Failed to fetch hosts:', error);
-        return [];
-    }
-};
-
-const generateRandomHotelId = (): string => {
-    const randomDigits = Math.floor(1000 + Math.random() * 9000); 
-    return `H${randomDigits}`; 
-};
-
-export const getUserById = async (userId: string): Promise<User | null> => {
-    try {
-        const response = await axios.get<User>(`${API_BASE_URL}/users/${userId}`);
+        });
         return response.data;
-    } catch (error) {
-        console.error('Failed to fetch user:', error);
-        return null;
-    }
-};
-
-export const addCustomer = async (adminUser: User | null, customer: Omit<User, 'userId'>): Promise<User> => {
-    try {
-        const newUserId = generateRandomHotelId(); 
-        let newCustomer = { ...customer, userId: newUserId };
-
-        if (customer.role === 'host') {
-            const newhotelId = generateRandomHotelId(); 
-
-            newCustomer = { ...newCustomer, hotelId: newhotelId }; 
-
-            const hotelData = {
-                id: newhotelId,
-                hotelId: newhotelId,
-                userId: newUserId, 
-                name: "",
-                location: {
-                    country: "",
-                    city: "",
-                    address: "",
-                    latitude: "",
-                    longitude: ""
-                },
-                facilities: [] as string[],
-                images: [] as string[]
-            };
-
-
-            await axios.post(`${API_BASE_URL}/hotels`, hotelData);
-        }
-
-        const response = await axios.post<User>(`${API_BASE_URL}/users`, newCustomer);
-        
-        return response.data;
-    } catch (error) {
-        console.error('Failed to add customer:', error);
+    } catch (error: any) {
+        console.error('Failed to add customer:', error.response?.data || error.message);
         throw error;
     }
 };
@@ -121,7 +95,21 @@ export const addCustomer = async (adminUser: User | null, customer: Omit<User, '
 
 export const updateCustomer = async (adminUser: User | null, id: string, customer: Partial<User>): Promise<User> => {
     try {
-        const response = await axios.patch<User>(`${API_BASE_URL}/users/${id}`, customer);
+        // Kiểm tra xem adminUser có phải là admin không
+        if (!adminUser || adminUser.role !== 'admin') {
+            throw new Error('Unauthorized: Only admin can update customer');
+        }
+        console.log(id);
+
+        const token = localStorage.getItem('token');
+        const response = await axios.patch<User>(`${API_SERVER_URL}/users/updateuser/${id}`, customer, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        console.log(response.data);
+
         return response.data;
     } catch (error) {
         console.error('Failed to update customer:', error);
@@ -129,53 +117,29 @@ export const updateCustomer = async (adminUser: User | null, id: string, custome
     }
 };
 
-export const deleteCustomer = async (adminUser: User | null, userId: string): Promise<void> => {
+
+export const updateHotelByHost = async (id: string, data: Record<string, any>): Promise<void> => {
     try {
+        const token = localStorage.getItem('token');
 
-        const userResponse = await axios.get<User>(`${API_BASE_URL}/users/${userId}`);
-        const user = userResponse.data;
-
-        if (user.role === 'host' && user.hotelId) {
-
-            const hotelsResponse = await axios.get(`${API_BASE_URL}/hotels?hotelId=${user.hotelId}`);
-            const hotels = hotelsResponse.data;
-
-
-            for (const hotel of hotels) {
-                await axios.delete(`${API_BASE_URL}/hotels/${hotel.id}`);
-            }
-        }
-
-        await axios.delete(`${API_BASE_URL}/users/${userId}`);
-    } catch (error) {
-        console.error('Failed to delete customer:', error);
-        throw error;
-    }
-};
-
-export const updateHotelByHost = async (user: User | null, hotelData: any): Promise<void> => {
-    if (!user) {
-        throw new Error('User is not authenticated.');
-    }
-    if (!isHost(user)) {
-        throw new Error('Access denied: Host only.');
-    }
-
-    try {
-        await axios.patch(`${API_BASE_URL}/hotels/${user.hotelId}`, hotelData);
+        await axios.put(`${API_SERVER_URL}/hotels/update/${id}`, JSON.stringify(data), {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
     } catch (error) {
         console.error('Failed to update hotel information:', error);
         throw error;
     }
 };
 
-export const getHotelByHost = async (user: User | null): Promise<any> => {
-    if (!user) {
-        throw new Error('User is not authenticated.');
-    }
 
+export const getAllHotel = async (): Promise<any> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/hotels/${user.hotelId}`);
+        // Lấy ownerId từ user (giả sử user có trường _id hoặc id chứa thông tin chủ khách sạn)
+        const response = await axios.get(`${API_SERVER_URL}/hotels/all`); 
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error('Failed to fetch hotel information:', error);
@@ -183,23 +147,22 @@ export const getHotelByHost = async (user: User | null): Promise<any> => {
     }
 };
 
-export const getBookingsByHotelId = async (user: User | null): Promise<Booking[]> => {
-    if (!user) {
-        throw new Error('User is not authenticated.');
-    }
-
-    if (!user.hotelId) {
-        throw new Error('User does not have an associated hotel ID.');
-    }
-
-    if (!isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
-    }
-
+export const getHotelByHost = async (id: String): Promise<any> => {
     try {
-        const response = await axios.get<Booking[]>(`${API_BASE_URL}/booking`, {
-            params: { hotelId: user.hotelId },
-        });
+        // Lấy ownerId từ user (giả sử user có trường _id hoặc id chứa thông tin chủ khách sạn)
+        const response = await axios.get(`${API_SERVER_URL}/hotels/owner/${id}`); // Thay `user._id` với thông tin thực tế trong hệ thống của bạn
+        // console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch hotel information:', error);
+        throw error;
+    }
+};
+
+export const getBookings = async (id: String): Promise<Booking[]> => {
+    try {
+        // Gọi API với hotelId từ user
+        const response = await axios.get<Booking[]>(`${API_SERVER_URL}/reservations/booking/${id}`);
         // console.log(response.data);
         return response.data;
     } catch (error) {
@@ -208,128 +171,66 @@ export const getBookingsByHotelId = async (user: User | null): Promise<Booking[]
     }
 };
 
-export const addBooking = async (user: User | null, booking: Omit<Booking, 'bookingId'>): Promise<Booking> => {
-    if (!user || !isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
-    }
-
+export const getBookingsByUser = async (id: String): Promise<Booking[]> => {
     try {
-        const rooms = await getRoomsByHotelId(user);
-        
-        const roomToUpdate: Room | undefined = rooms.find(room => room.id === booking.roomId);
-
-        if (!roomToUpdate) {
-            throw new Error('Room not found');
-        }
-
-        const bookedQuantity = 1; 
-        const newAvailable = roomToUpdate.available - bookedQuantity;
-
-        if (newAvailable < 0) {
-            throw new Error('No available rooms for booking');
-        }
-
-        const updatedRoomResponse = await updateRoom(user, roomToUpdate.id, { available: newAvailable });
-
-        // console.log(`Room ID: ${roomToUpdate.id}, New Available Count: ${newAvailable}`);
-        
-        if (newAvailable === 0) {
-            await updateRoom(user, roomToUpdate.id, { status: 'ROO' });
-            // console.log(`Room ID: ${roomToUpdate.id} status updated to 'ROO'`);
-        }
-
-        const bookingWithHotelId = { ...booking, hotelId: user.hotelId };
-
-        const response = await axios.post<Booking>(`${API_BASE_URL}/booking`, bookingWithHotelId);
-        const newBooking = response.data;
-        const userResponse = await axios.get<User>(`${API_BASE_URL}/users/${booking.userId}`);
-        const updatedUser = {
-            ...userResponse.data,
-            bookingIds: [...userResponse.data.bookingIds, newBooking.id],
-        };
-
-        // Update the user data with the new booking ID in bookingIds
-        await axios.put(`${API_BASE_URL}/users/${booking.userId}`, updatedUser);
-
-        // console.log('Booking added successfully:', newBooking);
-        return newBooking;
+        // Gọi API với hotelId từ user
+        const response = await axios.get<Booking[]>(`${API_SERVER_URL}/reservations/bookinguser/${id}`);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error('Failed to add booking:', error);
-        throw error;
+        console.error('Failed to fetch bookings:', error);
+        return [];
     }
 };
 
-
-
-export const updateBooking = async (user: User | null, bookingId: string, booking: Partial<Booking>): Promise<Booking> => {
-    if (!user || !isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
+export const getBookingsByHotelId = async (user: User | null): Promise<Booking[]> => {
+    if (!user) {
+        throw new Error('User is not authenticated.');
     }
 
     try {
-        const response = await axios.patch<Booking>(`${API_BASE_URL}/booking/${bookingId}`, booking);
+        // Gọi API với hotelId từ user
+        const hotelId = localStorage.getItem('hotelId');
+        console.log(hotelId);
+        const response = await axios.get<Booking[]>(`${API_SERVER_URL}/reservations/booking/${hotelId}`);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error('Failed to update booking:', error);
-        throw error;
+        console.error('Failed to fetch bookings:', error);
+        return [];
     }
 };
 
-export const deleteBooking = async (user: User | null, bookingId: string): Promise<void> => {
-    if (!user || !isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
-    }
-
+export const getBooking = async (id: String): Promise<Booking[]> => {
     try {
-        const bookingToDelete = await getBookingById(bookingId); 
-
-        if (!bookingToDelete) {
-            throw new Error('Booking not found');
-        }
-
-        const rooms = await getRoomsByHotelId(user);
-        const roomToUpdate: Room | undefined = rooms.find(room => room.id === bookingToDelete.roomId);
-
-        if (!roomToUpdate) {
-            throw new Error('Room not found for the booking');
-        }
-
-        if (roomToUpdate.available === 0) {
-            await updateRoom(user, roomToUpdate.id, { status: 'Allow' });
-        }
-
-        await axios.delete(`${API_BASE_URL}/booking/${bookingId}`);
-
-        const newAvailable = roomToUpdate.available + 1; 
-        await updateRoom(user, roomToUpdate.id, { available: newAvailable });
-
-    } catch (error) {
-        console.error('Failed to delete booking:', error);
-        throw error;
-    }
-};
-
-
-const getBookingById = async (bookingId: string): Promise<Booking | null> => {
-    try {
-        const response = await axios.get<Booking>(`${API_BASE_URL}/booking/${bookingId}`);
+        // Gọi API với hotelId từ user
+        const response = await axios.get<Booking[]>(`${API_SERVER_URL}/reservations/bookingid/${id}`);
+        console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error('Failed to fetch booking:', error);
-        return null;
+        console.error('Failed to fetch bookings:', error);
+        return [];
     }
 };
+
+export const updateGuest = async (id: string, guestInfo: any): Promise<any> => {
+    try {
+      const response = await axios.put(`${API_SERVER_URL}/reservations/bookings/${id}/guests`, guestInfo);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update guest:', error);
+      throw error;
+    }
+  };
+  
 
 
 export const getRoomsByHotelId = async (user: User | null): Promise<Room[]> => {
-    if (!user || !user.hotelId || !isHost(user)) {
-        throw new Error('Access denied or invalid hotel ID');
-    }
+    const hotelId = localStorage.getItem('hotelId');
+    // console.log(hotelId);   
+    // console.log(`${API_SERVER_URL}/rooms/room/${hotelId}`);
     try {
-        const response = await axios.get<Room[]>(`${API_BASE_URL}/rooms`, {
-            params: { hotelId: user.hotelId },
-        });
+        const response = await axios.get<Room[]>(`${API_SERVER_URL}/rooms/room/${hotelId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to fetch rooms:', error);
@@ -337,30 +238,64 @@ export const getRoomsByHotelId = async (user: User | null): Promise<Room[]> => {
     }
 };
 
-export const addRoom = async (user: User | null, room: Omit<Room, 'id' | 'available'>): Promise<Room> => {
+export const addRoom = async (
+    user: User | null,
+    room: Omit<Room, 'id' | 'available'> & {
+        roomNumber: string;
+        roomType: string;
+        startDate: string;
+        endDate: string;
+        files?: File[];
+        amenities?: []; 
+    }
+): Promise<Room> => {
     if (!user || !isHost(user)) {
         throw new Error('Access denied: User is not a host.');
     }
+    
+    const hotelId = localStorage.getItem('hotelId');
+    const token = localStorage.getItem('token');
 
-    const price: number = Number(room.price);
-    const capacity: number = Number(room.capacity);
-    const quantity: number = Number(room.quantity);
-    const available: number = quantity > 0 ? quantity : 0; 
+    if (!hotelId || !token) {
+        throw new Error('Hotel ID or token is missing.');
+    }
 
-    const status = quantity === 0 ? 'ROO' : room.status;
-
-    const roomWithHotelIdAndAvailability = { 
-        ...room, 
-        hotelId: user.hotelId, 
-        price,         
-        capacity,       
-        quantity,       
-        available,      
-        status 
-    };
+    const startDate = new Date(room.startDate);
+    const endDate = new Date(room.endDate);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
+        throw new Error('Invalid dates: startDate must be before endDate.');
+    }
 
     try {
-        const response = await axios.post<Room>(`${API_BASE_URL}/rooms`, roomWithHotelIdAndAvailability);
+        const formData = new FormData();
+        formData.append('roomNumber', room.roomNumber);
+        formData.append('roomType', room.roomType);
+        formData.append('price', String(room.price));
+        formData.append('capacity', String(room.capacity));
+        formData.append('startDate', room.startDate);
+        formData.append('endDate', room.endDate);
+        formData.append('hotelId', hotelId);
+
+        // Thêm danh sách amenities
+        formData.append('amenities', JSON.stringify(room.amenities));
+        // Thêm file ảnh/video
+        if (room.files && room.files.length > 0) {
+            room.files.forEach(file => {
+                formData.append(`files`, file, file.name);
+            });
+        }
+
+        const response = await axios.post<Room>(
+            `${API_SERVER_URL}/rooms/hotels/${hotelId}/rooms`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+
         return response.data;
     } catch (error) {
         console.error('Failed to add room:', error);
@@ -369,33 +304,21 @@ export const addRoom = async (user: User | null, room: Omit<Room, 'id' | 'availa
 };
 
 
+
 export const updateRoom = async (user: User | null, roomId: string, room: Partial<Room>): Promise<Room> => {
     if (!user || !isHost(user)) {
         throw new Error('Access denied: User is not a host.');
     }
 
     try {
-        const currentRoomResponse = await axios.get<Room>(`${API_BASE_URL}/rooms/${roomId}`);
-        const currentRoom = currentRoomResponse.data;
+        const token = localStorage.getItem('token');
 
-        let updatedAvailable = currentRoom.available;
-
-        if (room.available !== undefined) {
-            updatedAvailable = room.available;
-
-            if (updatedAvailable < 0) {
-                throw new Error('Invalid input: Available rooms cannot be negative.');
+        const response = await axios.put<Room>(`${API_SERVER_URL}/rooms/update/${roomId}`, room, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
             }
-        }
-
-        let updatedStatus = room.status ?? currentRoom.status;  
-        if (updatedAvailable === 0) {
-            updatedStatus = 'ROO'; 
-        }
-
-        const updatedRoom = { ...room, available: updatedAvailable, status: updatedStatus };
-
-        const response = await axios.patch<Room>(`${API_BASE_URL}/rooms/${roomId}`, updatedRoom);
+        });
         return response.data;
     } catch (error) {
         if (error instanceof Error) {
@@ -407,70 +330,11 @@ export const updateRoom = async (user: User | null, roomId: string, room: Partia
     }
 };
 
-export const deleteRoom = async (user: User | null, roomId: string): Promise<void> => {
-    if (!user || !isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
-    }
-
-    try {
-        await axios.delete(`${API_BASE_URL}/rooms/${roomId}`);
-    } catch (error) {
-        console.error('Failed to delete room:', error);
-        throw error;
-    }
-};
-
-export const getRoomTypeByBookingId = async (user: User | null, bookingId: string): Promise<string | null> => {
-    if (!user || !isHost(user)) {
-        throw new Error('Access denied: User is not a host.');
-    }
-
-    try {
-        const bookingResponse = await axios.get<Booking>(`${API_BASE_URL}/booking/${bookingId}`);
-        const booking = bookingResponse.data;
-
-        const roomId = booking.roomId;
-        if (!roomId) {
-            throw new Error('Room ID not found in the booking.');
-        }
-
-        const roomResponse = await axios.get<Room>(`${API_BASE_URL}/rooms/${roomId}`);
-        const room = roomResponse.data;
-
-        return room.type || null;
-    } catch (error) {
-        console.error('Failed to fetch room type:', error);
-        throw error;
-    }
-};
-
-export const getTotalAndAvailableRooms = async (user: User | null): Promise<{ totalRooms: number; availableRooms: number }> => {
-    if (!user || !user.hotelId || !isHost(user)) {
-        throw new Error('Access denied or invalid hotel ID');
-    }
-    try {
-        const response = await axios.get<Room[]>(`${API_BASE_URL}/rooms`, {
-            params: { hotelId: user.hotelId },
-        });
-
-        const rooms = response.data;
-
-        const totalRooms = rooms.reduce((total, room) => total + room.quantity, 0);
-        const availableRooms = rooms.reduce((total, room) => {
-            return room.status === 'Allow' ? total + room.available : total;
-        }, 0);
-
-        return { totalRooms, availableRooms };
-    } catch (error) {
-        console.error('Failed to fetch rooms:', error);
-        return { totalRooms: 0, availableRooms: 0 };
-    }
-};
 
 export const getTotalUsers = async (): Promise<number> => {
     try {
         const customers = await getCustomers();
-        const users = customers.filter(user => user.role === 'user');
+        const users = customers.filter(user => user.role === 'customer');
         return users.length;
     } catch (error) {
         console.error('Failed to fetch total users:', error);
@@ -492,7 +356,7 @@ export const getTotalCustomers = async (): Promise<number> => {
 export const getTotalHosts = async (): Promise<number> => {
     try {
         const customers = await getCustomers();
-        const totalHosts = customers.filter(user => user.role === 'host'); 
+        const totalHosts = customers.filter(user => user.role === 'hotelOwner'); 
         return totalHosts.length;
     } catch (error) {
         console.error('Failed to fetch total hosts:', error);
@@ -500,15 +364,10 @@ export const getTotalHosts = async (): Promise<number> => {
     }
 };
 
-export const getPromotionsByHotelId = async (user: User | null): Promise<any[]> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
 
+export const getRatingByRoomId = async (id: String): Promise<any[]> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/promotion`, {
-            params: { hotelId: user.hotelId },
-        });
+        const response = await axios.get(`${API_SERVER_URL}/reviews/review/${id}`);
         return response.data;
     } catch (error) {
         console.error('Failed to fetch promotions:', error);
@@ -516,126 +375,257 @@ export const getPromotionsByHotelId = async (user: User | null): Promise<any[]> 
     }
 };
 
-export const addPromotion = async (user: User | null, promotion: Omit<any, 'id'>): Promise<any> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
-
+export const getOrderByHotelId = async () => {
+    const hotelId = localStorage.getItem('hotelId');
     try {
-        const promotionWithHotelId = { ...promotion, hotelId: user.hotelId };
-        const response = await axios.post(`${API_BASE_URL}/promotion`, promotionWithHotelId);
-        return response.data; 
+        // Lấy ownerId từ user (giả sử user có trường _id hoặc id chứa thông tin chủ khách sạn)
+        const response = await axios.get(`${API_SERVER_URL}/orders/order/${hotelId}`); // Thay `user._id` với thông tin thực tế trong hệ thống của bạn
+        // console.log(response.data);
+        return response.data;
     } catch (error) {
-        console.error('Failed to add promotion:', error);
+        console.error('Failed to fetch hotel information:', error);
+        throw error;
+    }
+}
+
+export const backupData = async () => {
+    try {
+        const response = await axios.post(`${API_SERVER_URL}/systems/backup`);
+        return response.data; // Trả về thông tin file backup từ server
+    } catch (error) {
+        console.error('Failed to perform backup:', error);
         throw error;
     }
 };
 
-export const updatePromotion = async (user: User | null, promotionId: string, promotion: Partial<any>): Promise<any> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
 
+export const restoreData = async () => {
     try {
-        const response = await axios.patch(`${API_BASE_URL}/promotion/${promotionId}`, promotion);
-        return response.data; 
+        const response = await axios.post(`${API_SERVER_URL}/systems/restore`);
+        return response.data; // Trả về thông tin kết quả từ server
     } catch (error) {
-        console.error('Failed to update promotion:', error);
+        console.error('Failed to restore data:', error);
         throw error;
     }
 };
 
-export const deletePromotion = async (user: User | null, promotionId: string): Promise<void> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
-
+export const deleteMedia = async (roomId: string, fileName: any) => {
     try {
-        await axios.delete(`${API_BASE_URL}/promotion/${promotionId}`);
-    } catch (error) {
-        console.error('Failed to delete promotion:', error);
-        throw error;
-    }
-};
-
-export const getRatingByHotelId = async (user: User | null): Promise<any[]> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
-
-    try {
-        const response = await axios.get(`${API_BASE_URL}/review`, {
-            params: { hotelId: user.hotelId },
+        const token = localStorage.getItem('token');
+        const response = await axios.delete(`${API_SERVER_URL}/rooms/rooms/${roomId}/media/${fileName}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
         });
+        console.log('Updated media:', response.data.media);
         return response.data;
     } catch (error) {
-        console.error('Failed to fetch promotions:', error);
+        console.error('Error deleting file:', error);
         throw error;
     }
 };
 
-export const addReview = async (user: User | null, review: Omit<any, 'id'>): Promise<any> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
-
+export const addMedia = async (roomId: string, files: File[]) => {
+    const formData = new FormData();
+    const hotelId = localStorage.getItem('hotelId')
+    formData.append('hotelId', hotelId);
+    files.forEach((file: File) => formData.append('files', file));
+    const token = localStorage.getItem('token');
     try {
-        const promotionWithHotelId = { ...review, hotelId: user.hotelId };
-        const response = await axios.post(`${API_BASE_URL}/review`, promotionWithHotelId);
-        return response.data; 
+        const response = await axios.post(`${API_SERVER_URL}/rooms/rooms/${roomId}/media`, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        console.log('Updated media:', response.data.media);
+        return response; 
     } catch (error) {
-        console.error('Failed to add promotion:', error);
+        console.error('Error uploading files:', error);
         throw error;
     }
+
 };
 
-export const updateReview = async (user: User | null, reviewId: string, review: Partial<any>): Promise<any> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
-
+export const signup = async (userData: any) => {
     try {
-        const response = await axios.patch(`${API_BASE_URL}/review/${reviewId}`, review);
-        return response.data; 
+        console.log(userData);
+      const response = await axios.post(`${API_SERVER_URL}/auth/register-hotel`, userData);
+      return response.data; 
     } catch (error) {
-        console.error('Failed to update promotion:', error);
+        console.error(error);
         throw error;
     }
-};
+  };
 
-export const deleteReview = async (user: User | null, reviewId: string): Promise<void> => {
-    if (!user || !user.hotelId) {
-        throw new Error('Access denied: User does not have an associated hotel ID.');
-    }
 
+  export const sendVerificationCode = async (email: string): Promise<{ success: boolean; message?: string }> => {
     try {
-        await axios.delete(`${API_BASE_URL}/review/${reviewId}`);
+      const response = await axios.post(`${API_SERVER_URL}/auth/send-verification-code`, { email });
+      return response.data;
     } catch (error) {
-        console.error('Failed to delete promotion:', error);
+        console.error(error);
         throw error;
     }
-};
-
-
-export const updateMaintenanceMode = async (isMaintenance: boolean) => {
-    try {
-        const response = await axios.patch(`${API_BASE_URL}/settings/1`, { maintenanceMode: isMaintenance });
-        return response.data;
-    } catch (error) {
-        console.error("Failed to update maintenance mode:", error);
-        throw error;
-    }
-};
-
+  };
   
-  export const getMaintenanceMode = async () => {
+
+  export const verifyEmail = async (params: { email: string; code: string }): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/settings/1`);
-      return response.data.maintenanceMode; 
+      const response = await axios.post(`${API_SERVER_URL}/auth/verify-email`, params);
+      return response.data;
     } catch (error) {
-      console.error("Failed to fetch maintenance mode:", error);
-      throw error; 
+        console.error(error);
+        throw error;
+    }
+  };
+
+  export const resetpassword = async (email: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await axios.post(`${API_SERVER_URL}/auth/reset-password`, { email });
+      return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+  };
+
+
+export const getCustomerTransactions = async (userId: String) => {
+    try {
+        if (!userId) {
+            throw new Error("userId is required");
+        }
+
+        // Gửi yêu cầu GET đến API
+        const response = await axios.post(`${API_SERVER_URL}/transaction/customer`, { userId
+        });
+
+        // Kiểm tra nếu API trả về thành công
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            console.error('Error fetching transactions:', response.data.message);
+            return [];
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
 };
 
+export const getTransaction = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_SERVER_URL}/transaction/admin`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response.data; // Trả về thông tin file backup từ server
+    } catch (error) {
+        console.error('Failed to perform backup:', error);
+        throw error;
+    }
+}
 
+export const getTransactionbyHost = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_SERVER_URL}/transaction/host`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response.data; // Trả về thông tin file backup từ server
+    } catch (error) {
+        console.error('Failed to perform backup:', error);
+        throw error;
+    }
+}
+
+export const updateBookDates = async (roomId: String, checkInDate: String, checkOutDate:String) => {
+    try {
+      // Define the API endpoint
+
+      const token = localStorage.getItem('token');
+      // Send a PUT request to the backend
+      const response = await axios.put(`${API_SERVER_URL}/reservations/addbook/${roomId}`, {
+        checkInDate,
+        checkOutDate,
+      }, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+      }
+    );
+    console.log(response.data);
+    return response.data;
+    } catch (error) {
+        console.error('Failed to perform backup:', error);
+        throw error;
+    }
+  };
+
+export const updateRoomAvailableDate = async (roomId: String, checkInDate: String, checkOutDate:String) => {
+    try {
+      // Define the API endpoint
+
+      const token = localStorage.getItem('token');
+      // Send a PUT request to the backend
+      const response = await axios.put(`${API_SERVER_URL}/rooms/updatedates/${roomId}`, {
+        checkInDate,
+        checkOutDate,
+      }, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+      }
+    );
+    console.log(response.data);
+    return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+  };
+
+
+  export const deleteMediaHotel = async (hotelId: string, fileName: any) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.delete(`${API_SERVER_URL}/hotels/hotels/${hotelId}/media/${fileName}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        console.log('Updated media:', response.data.media);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        throw error;
+    }
+};
+
+export const addMediaHotel = async (hotelId: string, files: File[]) => {
+    const formData = new FormData();
+    formData.append('hotelId', hotelId);
+    files.forEach((file: File) => formData.append('files', file));
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.post(`${API_SERVER_URL}/hotels/hotels/${hotelId}/media`, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        console.log('Updated media:', response.data.media);
+        return response; 
+    } catch (error) {
+        console.error('Error uploading files:', error);
+        throw error;
+    }
+
+};

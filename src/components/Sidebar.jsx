@@ -1,7 +1,7 @@
 import React from 'react';
 import { Flex, Menu } from 'antd';
 import { FaLeaf } from 'react-icons/fa6';
-import { AppstoreOutlined, UserOutlined, SettingOutlined, CalendarOutlined, HomeOutlined, DollarCircleOutlined, TagOutlined, StarOutlined } from '@ant-design/icons'; // Import the TagOutlined icon
+import { AppstoreOutlined, UserOutlined, SettingOutlined, CalendarOutlined, HomeOutlined,ClockCircleOutlined, DollarCircleOutlined, TagOutlined, StarOutlined } from '@ant-design/icons'; // Import the TagOutlined icon
 import './style/Sidebar.css';
 const Sidebar = ({ selectedMenuItem, onMenuItemClick, role }) => {
   const hostItems = [
@@ -26,24 +26,24 @@ const Sidebar = ({ selectedMenuItem, onMenuItemClick, role }) => {
     {
       key: '4',
       icon: <TagOutlined />,
-      label: 'Promotions', 
+      label: 'Transactions', 
       onClick: () => onMenuItemClick('4'),
     },
-    {
-      key: '5',
-      icon: <StarOutlined />,
-      label: 'Rating & Review',
-      onClick: () => onMenuItemClick('5'),
-    },
-    {
-      key: '6',
-      icon: <DollarCircleOutlined />,
-      label: 'Payment',
-      onClick: () => onMenuItemClick('6'),
-    },
+    // {
+    //   key: '5',
+    //   icon: <StarOutlined />,
+    //   label: 'Rating & Review',
+    //   onClick: () => onMenuItemClick('5'),
+    // },
+    // {
+    //   key: '6',
+    //   icon: <DollarCircleOutlined />,
+    //   label: 'Payment',
+    //   onClick: () => onMenuItemClick('6'),
+    // },
     {
       key: '7',
-      icon: <SettingOutlined />,
+      icon: <HomeOutlined />,
       label: 'Setting',
       onClick: () => onMenuItemClick('7'),
     },
@@ -58,15 +58,27 @@ const Sidebar = ({ selectedMenuItem, onMenuItemClick, role }) => {
     },
     {
       key: '2',
-      icon: <UserOutlined />,
-      label: 'Accounts',
+      icon: <DollarCircleOutlined />,
+      label: 'Transaction',
       onClick: () => onMenuItemClick('2'),
     },
     {
       key: '3',
+      icon: <UserOutlined />,
+      label: 'Accounts',
+      onClick: () => onMenuItemClick('3'),
+    },
+    {
+      key: '4',
+      icon: <ClockCircleOutlined />,
+      label: 'Pending Accounts',
+      onClick: () => onMenuItemClick('4'),
+    },
+    {
+      key: '5',
       icon: <SettingOutlined />,
       label: 'System Setting',
-      onClick: () => onMenuItemClick('3'),
+      onClick: () => onMenuItemClick('5'),
     },
   ];
 

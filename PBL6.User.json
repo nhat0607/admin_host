@@ -1,0 +1,17 @@
+[{
+  "_id": {
+    "$oid": "67287bd1ce12b49452604bd8"
+  },
+  "name": "admin",
+  "email": "stayfindera@gmail.com",
+  "password": "$2a$10$4lROZ5Wm4ywRd56F4gXtNeGEwJMddqAtMc4sYb5G1GEeuv4PCzS1a",
+  "role": "admin",
+  "createdAt": {
+    "$date": "2024-11-04T07:46:25.818Z"
+  },
+  "updatedAt": {
+    "$date": "2024-11-04T07:46:25.818Z"
+  },
+  "__v": 0
+}
+]

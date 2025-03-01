@@ -1,0 +1,22 @@
+.btn-active.ant-btn-primary {
+    background-color: red !important;
+    border-color: red !important;
+  }
+  
+  .btn-active.ant-btn-primary:hover,
+  .btn-active.ant-btn-primary:focus {
+    background-color: #ff4d4f !important; /* Màu đậm hơn */
+    border-color: #ff4d4f !important;
+  }
+  
+  .btn-inactive.ant-btn-primary {
+    background-color: green !important;
+    border-color: green !important;
+  }
+  
+  .btn-inactive.ant-btn-primary:hover,
+  .btn-inactive.ant-btn-primary:focus {
+    background-color: #52c41a !important; /* Màu đậm hơn */
+    border-color: #52c41a !important;
+  }
+  

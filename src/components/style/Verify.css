@@ -1,0 +1,101 @@
+/* Container */
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f6f7f8; /* Light gray background */
+}
+
+/* Form */
+.verify-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+/* Form Title */
+.verify-form h2 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #223864; /* Dark blue */
+    margin-bottom: 10px;
+}
+
+/* Paragraph */
+.verify-form p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.verify-form .ant-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 18px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+}
+
+.verify-form .ant-input:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 121, 211, 0.5);
+}
+
+/* Buttons */
+.verify-form .ant-btn-primary {
+    width: 50%;
+    background-color: #0079d3;
+    border: none;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 18px;
+    height: 40px;
+}
+
+.verify-form .ant-btn-primary:hover {
+    background-color: #005a9c;
+}
+
+.verify-form .ant-btn-link {
+    width: calc(50% - 5px);
+    margin-left: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #0079d3;
+    padding: 0;
+    border-radius: 18px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    border: 1px solid #0079d3;
+}
+
+.verify-form .ant-btn-link:disabled {
+    color: #999;
+    cursor: not-allowed;
+}
+
+.verify-form .ant-btn-link:hover {
+    color: #005a9c;
+}
+
+/* Error and Success Messages */
+.error-text {
+    color: red;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.success-text {
+    color: green;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}

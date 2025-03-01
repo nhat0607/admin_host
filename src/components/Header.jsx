@@ -9,7 +9,9 @@ const CustomHeader = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate('/'); 
+    localStorage.removeItem('token');
+    localStorage.removeItem('hotelId');
+    navigate('/login'); 
   };
 
   const menu = (

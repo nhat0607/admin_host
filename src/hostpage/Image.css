@@ -1,0 +1,154 @@
+
+.room-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; 
+    border-radius: 8px; 
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out; 
+  }
+  
+  .room-image:hover {
+    transform: scale(1.1); 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+  }
+
+  .modal-image, .modal-video {
+    width: 600px; 
+    height: 400px; 
+    object-fit: fill;
+    object-position: center; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+    margin: 0 auto; 
+    display: block;
+  }
+  
+  .ant-carousel .slick-prev, 
+  .ant-carousel .slick-next {
+    display: none; 
+    z-index: 2; 
+  }
+
+  .ant-carousel:hover .slick-prev, 
+  .ant-carousel:hover .slick-next {
+    color: #000;
+    display: block; 
+  }
+  
+  .ant-modal-close {
+    z-index: 1000; 
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: rgba(0, 0, 0, 0.6); 
+    border-radius: 50%;
+    padding: 5px;
+  }
+  
+  .ant-modal-close-x {
+    color: black; 
+    font-size: 18px;
+    line-height: 1;
+  }
+  
+  .ant-carousel .slick-prev::before, 
+  .ant-carousel .slick-next::before {
+    font-size: 24px;
+    color: #000; 
+    opacity: 0.8; 
+  }
+  
+  .ant-carousel:hover .slick-prev::before, 
+  .ant-carousel:hover .slick-next::before {
+    opacity: 1; 
+  }
+
+.delete-overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.7);
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+div:hover .delete-overlay {
+  opacity: 1;
+}
+
+.ant-picker-calendar-date-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Đảm bảo toàn bộ ô được bao phủ */
+  background: none; /* Xóa nền mặc định nếu cần */
+  color: inherit; /* Giữ lại màu chữ tùy chỉnh */
+}
+
+.ant-picker-calendar .ant-picker-calendar-date-value {
+  display: none; /* Ẩn giá trị ngày mặc định */
+}
+
+.calendar-cell {
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+  padding: 2px;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 24px;
+}
+
+.calendar-cell.available {
+  background-color: #b7eb8f; /* Màu xanh nhạt cho trạng thái có sẵn */
+}
+
+.calendar-cell.booked {
+  background-color: #ffccc7; /* Màu đỏ nhạt cho trạng thái đã đặt */
+}
+
+.calendar-cell.expired {
+  background-color: #d9d9d9; /* Màu xám nhạt cho trạng thái đã hết hạn */
+}
+
+.calendar-cell.in-range {
+  background-color: #bae7ff; /* Màu xanh dương nhạt cho khoảng được chọn */
+  /* border-radius: 50%;  */
+}
+
+.calendar-cell.start-or-end {
+  background-color: #1890ff; /* Màu xanh dương đậm cho ngày bắt đầu/kết thúc */
+  color: white; /* Màu chữ trắng để nổi bật */
+  /* border-radius: 50%;  */
+  font-weight: bold; /* Tô đậm chữ để nhấn mạnh */
+}
+
+
+:where(.css-dev-only-do-not-override-ccdg5a).ant-picker-calendar 
+.ant-picker-cell-in-view.ant-picker-cell-today 
+.ant-picker-cell-inner::before {
+    /* width: 100%;
+    height: 110%;
+    padding: 3px;  */
+    border: none;
+    /* content: none;  */
+}
+
+:where(.css-dev-only-do-not-override-ccdg5a).ant-picker-calendar 
+.ant-picker-cell-in-view.ant-picker-cell-today 
+.ant-picker-cell-inner {
+    color: #1890ff;
+}

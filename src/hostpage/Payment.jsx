@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Space, Modal, Form, Input as AntInput, Select, Popconfirm, Popover } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { getOrderByHotelId } from '../api/api';
 import './Components.css';
 
 const { Option } = Select;
 
-const initialPaymentData = [
-  { key: '1', bookingId: 'C001', price: 150, status: 'Paid', method: 'Credit Card', paymentDate: '2024-10-01' },
-  { key: '2', bookingId: 'C002', price: 200, status: 'Due', method: 'Unknown' },
-  { key: '3', bookingId: 'C003', price: 300, status: 'Paid', method: 'Bank Transfer', paymentDate: '2024-10-01' },
-];
 
-const Payment = () => {
-  const [dataSource, setDataSource] = useState(initialPaymentData);
+const Payment = ({ user }) => {
+  const [dataSource, setDataSource] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
   const [popoverVisible, setPopoverVisible] = useState({});
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (user) {
+        const orders = await getOrderByHotelId(user);
+        console.log(orders);
+        // setRoomData(rooms);
+      }
+    };
+    fetchOrders();
+  }, [user]);
 
   const handleAddPayment = () => {
     setSelectedPayment(null);

@@ -1,0 +1,109 @@
+/* Container */
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f6f7f8; /* Light gray background */
+}
+
+/* Form */
+.signup-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+/* Form Title */
+.form-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #223864; /* Dark blue */
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-field {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 18px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0; /* Slight gray background */
+    margin-bottom: 5px;
+    
+}
+
+.ant-form-item .ant-form-item-control .ant-input {
+    border-radius: 18px;
+}
+
+.input-field:focus {
+    /* border-color: #0079d3; */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 121, 211, 0.5);
+}
+
+/* Buttons */
+.primary-button {
+    width: 100%;
+    background-color: #0079d3;
+    border: none;
+    height: 40px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background-color: #005a9c;
+}
+
+.secondary-button {
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #0079d3;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.secondary-button:hover {
+    color: #005a9c;
+}
+
+/* Error and Success Messages */
+.error-text {
+    color: red;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.success-text {
+    color: green;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Navigation Links */
+.navigation-link {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 16px;
+}
+
+.navigation-link a {
+    color: #0079d3;
+    text-decoration: none;
+}
+
+.navigation-link a:hover {
+    text-decoration: underline;
+}

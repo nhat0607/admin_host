@@ -1,0 +1,17 @@
+{
+  "_id": { "$oid": "64b2fae9123d4a001c2a8b72" }, 
+  "userId": { "$oid": "67287c42ce12b49452604bdb" },
+  "reservationId": { "$oid": "672a2bff98ee789f3dbbdb83" },
+  "orderId": { "$oid": "64b2fae9123d4a001c2a8b73" }, 
+  "hostId": { "$oid": "64b2fae9123d4a001c2a8b74" }, 
+  "amount": 200.5,
+  "hostAmount": 180.45,
+  "adminFee": 20.05,
+  "paymentMethod": "Zalopay",
+  "transactionDate": { "$date": "2024-12-20T15:00:00.000Z" }, 
+  "status": "paid",
+  "hostName": "John Doe",
+  "hostEmail": "johndoe@example.com",
+  "createdAt": { "$date": "2024-12-20T15:00:00.000Z" },
+  "updatedAt": { "$date": "2024-12-20T15:00:00.000Z" }
+}
